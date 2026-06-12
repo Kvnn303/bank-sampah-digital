@@ -13,10 +13,13 @@ use App\Http\Controllers\Web\Admin\ArtikelController;
 use App\Http\Controllers\Web\Admin\AdminDashboardController;
 use App\Http\Controllers\Web\Admin\AdminManagementController;
 use App\Http\Controllers\Web\Admin\NotificationController;
+use App\Http\Controllers\Web\Admin\StokSampahController;
 
 // ====== LANDING PAGE PUBLIK =====
 Route::get('/', [LandingController::class, 'index'])->name('beranda');
 Route::get('/baca/{slug}', [LandingController::class, 'bacaArtikel'])->name('publik.artikel.baca');
+Route::get('/stok-tersedia', [LandingController::class, 'stokTersedia'])->name('publik.stok');
+Route::get('/stok/{slug}', [LandingController::class, 'detailStok'])->name('publik.stok.detail');
 
 
 // ====== ROUTE ADMIN ======
@@ -93,6 +96,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/tabungan/{id}/edit', [TabunganController::class, 'edit'])->name('tabungan.edit');
         Route::put('/tabungan/{id}',      [TabunganController::class, 'update'])->name('tabungan.update');
         Route::delete('/tabungan/{id}',   [TabunganController::class, 'destroy'])->name('tabungan.destroy');
+        Route::get('/tabungan/{id}/pdf', [TabunganController::class, 'downloadPdf'])->name('tabungan.pdf');
 
         // Penarikan
         Route::get('/penarikan',              [PenarikanController::class, 'index'])->name('penarikan.index');
@@ -111,6 +115,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/jenis-sampah/{id}/harga',   [JenisSampahController::class, 'updateHarga'])->name('jenis-sampah.harga');
         Route::put('/jenis-sampah/{id}/toggle',  [JenisSampahController::class, 'toggleStatus'])->name('jenis-sampah.toggle');
         Route::delete('/jenis-sampah/{id}',      [JenisSampahController::class, 'destroy'])->name('jenis-sampah.destroy');
+
+        // Stok Sampah
+        Route::get('/stok-sampah',              [StokSampahController::class, 'index'])->name('stok-sampah.index');
+        Route::get('/stok-sampah/create',       [StokSampahController::class, 'create'])->name('stok-sampah.create');
+        Route::post('/stok-sampah',             [StokSampahController::class, 'store'])->name('stok-sampah.store');
+        Route::get('/stok-sampah/{id}',         [StokSampahController::class, 'show'])->name('stok-sampah.show');
+        Route::get('/stok-sampah/{id}/edit',   [StokSampahController::class, 'edit'])->name('stok-sampah.edit');
+        Route::put('/stok-sampah/{id}',          [StokSampahController::class, 'update'])->name('stok-sampah.update');
+        Route::post('/stok-sampah/{id}/jual',   [StokSampahController::class, 'prosesJual'])->name('stok-sampah.jual');
+        Route::post('/stok-sampah/{id}/toggle-publish', [StokSampahController::class, 'togglePublish'])->name('stok-sampah.toggle-publish');
+        Route::post('/stok-sampah/{id}/toggle-press',   [StokSampahController::class, 'togglePress'])->name('stok-sampah.toggle-press');
+        Route::delete('/stok-sampah/{id}',      [StokSampahController::class, 'destroy'])->name('stok-sampah.destroy');
 
         // Laporan
         Route::get('/laporan',                     [LaporanController::class, 'index'])->name('laporan');

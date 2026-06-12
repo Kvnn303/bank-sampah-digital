@@ -21,10 +21,32 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Diperbaiki: 'layouts.app' diubah menjadi 'layouts.admin'
+        \App\Models\Tabungan::observe(\App\Observers\TabunganObserver::class);
+        \App\Models\Penarikan::observe(\App\Observers\PenarikanObserver::class);
+
+        // Share notifications untuk admin layout
         View::composer('layouts.admin', function ($view) {
-            $notifications = Notification::orderBy('created_at', 'desc')->take(10)->get();
-            $unreadCount = Notification::unread()->count();
+            // Hanya jalankan jika user sudah login dan merupakan admin
+            if (!auth()->check() || !auth()->user()->isAdmin()) {
+                $view->with([
+                    'notifications' => collect(),
+                    'unreadCount'   => 0,
+                ]);
+                return;
+            }
+
+            $adminId = auth()->id();
+
+            // Ambil notifikasi untuk admin (target_role = 'admin' dan user_id = null atau user_id = admin yang login)
+            $notifications = Notification::forAdmin($adminId)
+                                ->latest()
+                                ->take(10)
+                                ->get();
+
+            $unreadCount = Notification::forAdmin($adminId)
+                                ->unread()
+                                ->count();
+
             $view->with(compact('notifications', 'unreadCount'));
         });
     }

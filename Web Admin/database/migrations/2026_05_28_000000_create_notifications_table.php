@@ -1,4 +1,3 @@
-// database/migrations/xxxx_create_notifications_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -7,11 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
+        Schema::dropIfExists('notifications');
+
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->default('info');
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->string('type');
             $table->string('title');
             $table->text('message');
             $table->string('url')->nullable();
@@ -21,7 +23,7 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('notifications');
     }

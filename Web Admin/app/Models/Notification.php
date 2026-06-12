@@ -3,17 +3,46 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Notification extends Model
 {
+    // ─── KONSTANTA TYPE ────────────────────────────────────────
+    public const TYPE_TRANSASKSI = 'transaksi';
+    public const TYPE_HARGA      = 'harga';
+    public const TYPE_ARTIKEL    = 'artikel';
+    public const TYPE_NASABAH   = 'nasabah';
+    public const TYPE_PENARIKAN = 'penarikan';
+    public const TYPE_TABUNGAN  = 'tabungan';
+    public const TYPE_SAMPAH    = 'sampah';
+    public const TYPE_STOK      = 'stok';
+    public const TYPE_AUTH      = 'auth';
+    public const TYPE_AKUN      = 'akun';
+    public const TYPE_WARNING   = 'warning';
+    public const TYPE_SUCCESS   = 'success';
+    public const TYPE_DANGER    = 'danger';
+    public const TYPE_INFO      = 'info';
+    public const TYPE_DEFAULT   = 'default';
+
+    // ─── KONSTANTA STATUS (mobile banking style) ────────────────
+    public const STATUS_UNREAD = 'unread';
+    public const STATUS_READ   = 'read';
+
+    // ─── KONSTANTA PRIORITY ────────────────────────────────────
+    public const PRIORITY_LOW    = 'low';
+    public const PRIORITY_NORMAL = 'normal';
+    public const PRIORITY_HIGH   = 'high';
+
     protected $fillable = [
-        'type',
-        'target_role',
         'user_id',
+        'target_role',
+        'type',
         'title',
         'message',
         'url',
         'is_read',
+        'status',
+        'priority',
         'read_at',
     ];
 
@@ -22,7 +51,42 @@ class Notification extends Model
         'read_at' => 'datetime',
     ];
 
-    // ─── SCOPE DASAR ───
+    // ─── RELASI ────────────────────────────────────────────────
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // ─── METHOD INSTANCE ───────────────────────────────────────
+
+    /**
+     * Tandai notifikasi ini sudah dibaca.
+     */
+    public function markAsRead(): void
+    {
+        if (! $this->is_read) {
+            $this->update([
+                'is_read' => true,
+                'status'  => self::STATUS_READ,
+                'read_at' => now(),
+            ]);
+        }
+    }
+
+    public function markAllAsRead(int $userId): int
+    {
+        return self::where('user_id', $userId)
+                   ->where('is_read', false)
+                   ->update(['is_read' => true, 'status' => self::STATUS_READ, 'read_at' => now()]);
+    }
+
+    public static function unreadCount(int $userId): int
+    {
+        return self::where('user_id', $userId)->where('is_read', false)->count();
+    }
+
+    // ─── SCOPE FILTER ─────────────────────────────────────────
 
     public function scopeUnread($query)
     {
@@ -34,7 +98,10 @@ class Notification extends Model
         return $query->where('is_read', true);
     }
 
-    // ─── SCOPE FILTER ROLE (BARU) ───
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
 
     public function scopeForAdmin($query, ?int $adminId = null)
     {
@@ -50,49 +117,74 @@ class Notification extends Model
         return $query->where('target_role', 'nasabah')
                       ->where('user_id', $nasabahId);
     }
-
-    // ─── RELASI (BARU) ───
-
-    public function user()
+public function getIconBgClass(): string
+{
+    return match ($this->type) {
+        self::TYPE_AUTH      => 'bg-danger-soft text-danger',
+        self::TYPE_AKUN      => 'bg-purple-soft text-purple',
+        self::TYPE_TABUNGAN  => 'bg-success-soft text-success',
+        self::TYPE_NASABAH   => 'bg-primary-soft text-primary',
+        self::TYPE_PENARIKAN => 'bg-success-soft text-success',
+        self::TYPE_SAMPAH    => 'bg-warning-soft text-warning',
+        self::TYPE_STOK      => 'bg-info-soft text-info',
+        self::TYPE_ARTIKEL   => 'bg-purple-soft text-purple',
+        self::TYPE_HARGA     => 'bg-warning-soft text-warning',
+        self::TYPE_TRANSASKSI=> 'bg-primary-soft text-primary',
+        self::TYPE_SUCCESS   => 'bg-success-soft text-success',
+        self::TYPE_DANGER    => 'bg-danger-soft text-danger',
+        self::TYPE_WARNING   => 'bg-warning-soft text-warning',
+        self::TYPE_INFO      => 'bg-info-soft text-info',
+        default              => 'bg-light text-secondary',
+    };
+}
+    
+    public function scopeForRole($query, string $role)
     {
-        return $this->belongsTo(User::class);
+        return $query->where('target_role', $role);
     }
 
-    // ─── ICON (TETAP DIPAKAI) ───
-
-    public function getIconBgClass(): string
+    public function scopeHighestPriority($query)
     {
-        return match($this->type) {
-            'nasabah'   => 'bg-primary text-primary-fg',
-            'penarikan' => 'bg-success text-success-fg',
-            'tabungan'  => 'bg-info text-info-fg',
-            'sampah'    => 'bg-warning text-warning-fg',
-            'artikel'   => 'bg-purple text-purple-fg',
-            'stok'      => 'bg-teal text-teal-fg',
-            'auth'      => 'bg-danger text-danger-fg',
-            'akun'      => 'bg-secondary text-secondary-fg',
-            'warning'   => 'bg-warning text-warning-fg',
-            'success'   => 'bg-success text-success-fg',
-            'danger'    => 'bg-danger text-danger-fg',
-            default     => 'bg-primary text-primary-fg',
+        return $query->orderByRaw("FIELD(priority, 'high', 'normal', 'low')");
+    }
+
+    // ─── ACCESSOR: icon & warna (cocok untuk mobile banking UI) ─
+
+    public function getIconName(): string
+    {
+        return match ($this->type) {
+            self::TYPE_NASABAH   => 'users',
+            self::TYPE_PENARIKAN => 'currency',
+            self::TYPE_TABUNGAN  => 'wallet',
+            self::TYPE_SAMPAH    => 'recycle',
+            self::TYPE_ARTIKEL   => 'article',
+            self::TYPE_STOK      => 'package',
+            self::TYPE_AUTH      => 'shield',
+            self::TYPE_AKUN      => 'user',
+            self::TYPE_HARGA     => 'tag',
+            self::TYPE_TRANSASKSI => 'repeat',
+            self::TYPE_SUCCESS   => 'check-circle',
+            self::TYPE_DANGER    => 'alert-circle',
+            self::TYPE_WARNING   => 'alert-triangle',
+            default              => 'bell',
         };
     }
 
-    public function getIconSvg(): string
+    public function getColorClass(): string
     {
-        return match($this->type) {
-            'nasabah'   => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
-            'penarikan' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-            'tabungan'  => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-0.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2"/><path d="M2 9.1C1.7 7.7 3 4 8 2"/></svg>',
-            'sampah'    => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 19H4.15a1.15 1.15 0 0 1-1.12-1.4L5 7h14l2 10.6a1.15 1.15 0 0 1-1.12 1.4H17"/><path d="M9.5 2h5l1 5h-7z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>',
-            'artikel'   => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>',
-            'stok'      => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
-            'auth'      => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-            'akun'      => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-            'warning'   => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-            'success'   => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-            'danger'    => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-            default     => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        return match ($this->type) {
+            self::TYPE_PENARIKAN => '#16a34a',
+            self::TYPE_TABUNGAN  => '#10b981',
+            self::TYPE_SUCCESS  => '#16a34a',
+            self::TYPE_DANGER    => '#dc2626',
+            self::TYPE_WARNING   => '#d97706',
+            self::TYPE_HARGA     => '#d97706',
+            self::TYPE_ARTIKEL   => '#7c3aed',
+            self::TYPE_NASABAH   => '#2563eb',
+            self::TYPE_SAMPAH    => '#d97706',
+            self::TYPE_STOK      => '#0891b2',
+            self::TYPE_TRANSASKSI => '#2563eb',
+            default              => '#6366f1',
         };
     }
 }

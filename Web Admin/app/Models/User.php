@@ -16,6 +16,7 @@ class User extends Authenticatable
         'foto',
         'password',
         'role',
+        'login_username',
         'password_changed',
         'is_active',
     ];
@@ -32,7 +33,15 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
-    // Relasi ke nasabah
+    // ─── RELASI: NOTIFIKASI ───────────────────────────────────
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    // ─── RELASI: NASABAH ───────────────────────────────────────
+
     public function nasabah()
     {
         return $this->hasOne(Nasabah::class);

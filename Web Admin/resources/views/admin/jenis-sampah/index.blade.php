@@ -102,7 +102,7 @@
                     <div class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Total Jenis</div>
                     <div class="ms-auto icon-shape bg-blue-lt">
                         <!-- Ikon Package/Box (Menggantikan ikon dokumen aneh sebelumnya) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-blue-modern" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon trash-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
                             <line x1="12" y1="22.08" x2="12" y2="12"/>
@@ -190,10 +190,13 @@
                         <label class="form-label text-muted fw-semibold small">Filter Kategori</label>
                         <select name="kategori" id="kategoriFilter" class="form-select">
                             <option value="">Semua Kategori</option>
-                            <option value="organik" {{ request('kategori') == 'organik' ? 'selected' : '' }}>Organik</option>
-                            <option value="anorganik" {{ request('kategori') == 'anorganik' ? 'selected' : '' }}>Anorganik</option>
-                            <option value="b3" {{ request('kategori') == 'b3' ? 'selected' : '' }}>B3</option>
-                            <option value="umum" {{ request('kategori') == 'umum' ? 'selected' : '' }}>Umum</option>
+                            <option value="Plastik" {{ request('kategori') == 'Plastik' ? 'selected' : '' }}>Plastik</option>
+                            <option value="Kertas" {{ request('kategori') == 'Kertas' ? 'selected' : '' }}>Kertas</option>
+                            <option value="Logam" {{ request('kategori') == 'Logam' ? 'selected' : '' }}>Logam</option>
+                            <option value="Kaca" {{ request('kategori') == 'Kaca' ? 'selected' : '' }}>Kaca</option>
+                            <option value="Elektronik" {{ request('kategori') == 'Elektronik' ? 'selected' : '' }}>Elektronik</option>
+                            <option value="Organik" {{ request('kategori') == 'Organik' ? 'selected' : '' }}>Organik</option>
+                            <option value="Lainnya" {{ request('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                         </select>
                     </div>
                     <div class="col-12 col-md-2 d-flex gap-2">
@@ -307,7 +310,12 @@
                                 </li>
                                 <!-- Ubah Harga (Ikon Price Tag) -->
                                 <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center text-emerald fw-semibold" onclick="showHargaModal({{ $j->id }}, '{{ addslashes($j->nama) }}', {{ $j->harga_per_kg }})">
+                                    <button type="button"
+                                            class="dropdown-item d-flex align-items-center text-emerald fw-semibold"
+                                            data-id="{{ $j->id }}"
+                                            data-nama="{{ $j->nama }}"
+                                            data-harga="{{ $j->harga_per_kg }}"
+                                            onclick="showHargaModal(this.dataset.id, this.dataset.nama, this.dataset.harga)">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                                         Ubah Harga
                                     </button>
@@ -383,16 +391,16 @@
             <div class="modal-header bg-white border-bottom p-4">
                 <div class="d-flex align-items-center gap-3">
                     <div class="icon-shape bg-emerald-lt" style="width: 40px; height: 40px;">
-                        <!-- Ikon Tag Harga untuk Modal -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-emerald" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                     </div>
                     <h5 class="modal-title fw-bold text-dark fs-4 mb-0">Ubah Harga Sampah</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" id="formHarga">
+            <form method="POST" action="{{ route('admin.jenis-sampah.harga', '__ID__') }}" id="formHarga" class="form-harga">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="jenis_sampah_id" id="jenisSampahId">
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label text-muted fw-semibold small">Jenis Sampah</label>
@@ -422,7 +430,9 @@
                 </div>
                 <div class="modal-footer bg-slate-50 border-top p-3 d-flex justify-content-end">
                     <button type="button" class="btn btn-light border fw-semibold shadow-sm" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-4">Simpan Harga</button>
+                    <button type="submit" id="btnSimpanHarga" class="btn btn-primary fw-bold shadow-sm px-4">
+                        <span id="textSimpanHarga">Simpan Harga</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -440,12 +450,27 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showHargaModal(id, nama, harga) {
+    const form = document.getElementById('formHarga');
+    const modalEl = document.getElementById('modalHarga');
+
+    if (!form || !modalEl) {
+        alert('Gagal membuka modal. Silakan refresh halaman.');
+        return;
+    }
+
+    // Set form action — replaces __ID__ placeholder with actual ID
+    const actionUrl = '{{ route('admin.jenis-sampah.harga', '__ID__') }}'.replace('__ID__', id);
+    form.action = actionUrl;
+
+    // Fill form fields
     document.getElementById('namaHarga').value = nama;
-    document.getElementById('hargaLama').value = 'Rp ' + parseInt(harga).toLocaleString('id-ID');
-    document.getElementById('formHarga').action = '/admin/jenis-sampah/' + id + '/harga';
-    document.getElementById('formHarga').querySelector('input[name="harga_per_kg"]').value = '';
-    document.getElementById('formHarga').querySelector('textarea[name="alasan"]').value = '';
-    new bootstrap.Modal(document.getElementById('modalHarga')).show();
+    document.getElementById('hargaLama').value = 'Rp ' + Number(harga).toLocaleString('id-ID');
+    form.querySelector('input[name="harga_per_kg"]').value = Number(harga);
+    form.querySelector('textarea[name="alasan"]').value = '';
+
+    // Show modal
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
 }
 
 // LIVE SEARCH & FILTER
@@ -479,7 +504,7 @@ function filterTable() {
             if (statusVal === '1' && status !== 'aktif') show = false;
             if (statusVal === '0' && status !== 'nonaktif') show = false;
         }
-        if (show && kategoriVal && kategori !== kategoriVal) show = false;
+        if (show && kategoriVal && kategori !== kategoriVal.toLowerCase()) show = false;
 
         row.style.display = show ? '' : 'none';
         if (show) visibleCount++;
@@ -494,6 +519,21 @@ function filterTable() {
 if (searchInput) searchInput.addEventListener('keyup', filterTable);
 if (statusFilter) statusFilter.addEventListener('change', filterTable);
 if (kategoriFilter) kategoriFilter.addEventListener('change', filterTable);
+
+// Visual feedback saat submit form modal harga
+const formHarga = document.getElementById('formHarga');
+if (formHarga) {
+    formHarga.addEventListener('submit', function(e) {
+        const btn = document.getElementById('btnSimpanHarga');
+        const text = document.getElementById('textSimpanHarga');
+        if (btn && text) {
+            // Nonaktifkan tombol agar tidak double-submit
+            btn.disabled = true;
+            text.textContent = 'Menyimpan...';
+            // Biarkan form submit ke server secara normal — jangan intercept/hide modal
+        }
+    });
+}
 
 filterTable();
 </script>

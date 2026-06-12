@@ -94,7 +94,6 @@
 
 @section('content')
 
-<!-- Statistik -->
 <div class="row row-cards mb-4">
     <div class="col-6 col-lg-3">
         <div class="card stat-card h-100">
@@ -147,14 +146,13 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon text-purple" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12h-4a2 2 0 0 0 0 4h4"/></svg>
                     </div>
                 </div>
-                <div class="h3 mb-1 fs-3 text-purple fw-bold">Rp {{ number_format($totalNominal) }}</div>
+                <div class="h3 mb-1 fs-3 text-purple fw-bold">Rp {{ number_format($totalNominal, 0, ',', '.') }}</div>
                 <div class="text-slate-500 small fw-medium">Total Nilai Keluar</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Filter -->
 <div class="card card-modern mb-4">
     <div class="card-body p-4">
         <form method="GET" class="row g-3 align-items-end">
@@ -198,7 +196,6 @@
     </div>
 </div>
 
-<!-- Tabel Penarikan -->
 <div class="card card-modern">
     <div class="card-header bg-white border-bottom p-4 d-flex align-items-center justify-content-between">
         <h3 class="card-title fw-bold text-dark m-0 fs-4">Daftar Pengajuan Penarikan</h3>
@@ -239,13 +236,30 @@
                     </td>
                     <td class="text-end">
                         <div class="fw-bold text-rose fs-6">
-                            Rp {{ number_format($p->nominal) }}
+                            Rp {{ number_format($p->nominal, 0, ',', '.') }}
                         </div>
                     </td>
+
                     <td class="text-end d-none d-sm-table-cell">
-                        <span class="text-emerald fw-bold">
-                            Rp {{ number_format($p->nasabah->saldo ?? 0) }}
-                        </span>
+                        @php
+                            // Pastikan variabel saldo nasabah di-load (disesuaikan dengan nama accessor/relasi dari Claude)
+                            $sisaSaldo = $p->nasabah->saldo_realtime ?? 0;
+
+                            // Hitung saldo awal. Jika status belum ditolak, berarti saldo sudah terpotong di sistem.
+                            $saldoAwal = in_array($p->status, ['pending', 'diproses', 'selesai'])
+                                         ? $sisaSaldo + $p->nominal
+                                         : $sisaSaldo;
+                        @endphp
+
+                        @if(in_array($p->status, ['pending', 'diproses', 'selesai']))
+                            <div class="text-muted small text-decoration-line-through mb-1" style="opacity: 0.6;">
+                                Rp {{ number_format($saldoAwal, 0, ',', '.') }}
+                            </div>
+                        @endif
+
+                        <div class="text-emerald fw-bold" style="font-size: 1.05rem;">
+                            Rp {{ number_format($sisaSaldo, 0, ',', '.') }}
+                        </div>
                     </td>
                     <td>
                         <div class="fw-medium text-dark">{{ $p->created_at->format('d M Y') }}</div>
@@ -276,7 +290,6 @@
                                 Aksi
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px;">
-                                <!-- Lihat Detail -->
                                 <li>
                                     <a href="{{ route('admin.penarikan.show', $p->id) }}" class="dropdown-item d-flex align-items-center text-dark">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3" /><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/></svg>
@@ -286,7 +299,6 @@
 
                                 @if($p->status == 'pending')
                                     <li><hr class="dropdown-divider my-1 border-slate-100"></li>
-                                    <!-- Setujui -->
                                     <li>
                                         <form method="POST" action="{{ route('admin.penarikan.setujui', $p->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menyetujui penarikan ini?')">
                                             @csrf @method('PUT')
@@ -296,9 +308,8 @@
                                             </button>
                                         </form>
                                     </li>
-                                    <!-- Tolak -->
                                     <li>
-                                        <button type="button" class="dropdown-item d-flex align-items-center text-rose fw-semibold" onclick="showTolakModal({{ $p->id }})">
+                                        <button type="button" class="dropdown-item d-flex align-items-center text-rose fw-semibold border-0 bg-transparent w-100 text-start" data-bs-toggle="modal" data-bs-target="#modalTolak" onclick="setTolakAction({{ $p->id }})">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                                             Tolak Pengajuan
                                         </button>
@@ -307,7 +318,6 @@
 
                                 @if($p->status == 'diproses')
                                     <li><hr class="dropdown-divider my-1 border-slate-100"></li>
-                                    <!-- Selesai -->
                                     <li>
                                         <form method="POST" action="{{ route('admin.penarikan.selesai', $p->id) }}" onsubmit="return confirm('Tandai sebagai selesai? Pastikan uang tunai telah diterima oleh nasabah.')">
                                             @csrf @method('PUT')
@@ -349,7 +359,6 @@
     @endif
 </div>
 
-<!-- Modal Tolak -->
 <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-0">
@@ -396,11 +405,9 @@
 
 @push('scripts')
 <script>
-function showTolakModal(id) {
+function setTolakAction(id) {
     const form = document.getElementById('formTolak');
     form.action = '/admin/penarikan/' + id + '/tolak';
-    const modal = new bootstrap.Modal(document.getElementById('modalTolak'));
-    modal.show();
 }
 </script>
 @endpush

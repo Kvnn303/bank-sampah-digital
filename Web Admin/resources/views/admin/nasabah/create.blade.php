@@ -212,8 +212,32 @@
                                 @error('alamat') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
                             </div>
 
+                            <!-- Foto Profil -->
+                            <div class="col-md-6">
+                                <label class="form-label mb-2">Foto Profil <span class="text-muted fw-normal">(Opsional)</span></label>
+                                <div class="row g-3">
+                                    <div class="col-7">
+                                        <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/jpeg, image/png, image/jpg" id="input-foto-profil" onchange="previewFotoProfil(this)">
+                                        @error('foto') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
+                                        <div class="text-muted small mt-2 d-flex align-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                            JPG/PNG maks 2MB
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="upload-preview-area text-center d-flex align-items-center justify-content-center overflow-hidden position-relative" style="height: 100px;" id="preview-container-profil">
+                                            <div id="placeholder-profil" class="text-slate-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="d-block mx-auto mb-1 text-slate-300" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                                                <span class="small fw-medium">Preview</span>
+                                            </div>
+                                            <img id="preview-foto-profil" src="#" alt="Preview" class="img-fluid w-100 h-100 object-fit-cover rounded-3" style="display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Foto KTP -->
-                            <div class="col-12">
+                            <div class="col-md-6">
                                 <label class="form-label mb-2">Upload Foto KTP <span class="text-muted fw-normal">(Opsional)</span></label>
                                 <div class="row g-3">
                                     <div class="col-md-7 col-lg-8">
@@ -270,7 +294,6 @@
                 preview.style.display = 'block';
                 placeholder.style.display = 'none';
 
-                // Ubah gaya kontainer saat ada gambar
                 container.style.borderStyle = 'solid';
                 container.style.borderColor = '#e2e8f0';
                 container.style.backgroundColor = '#ffffff';
@@ -278,7 +301,6 @@
 
             reader.readAsDataURL(input.files[0]);
         } else {
-            // Reset ke awal jika dibatalkan
             preview.style.display = 'none';
             preview.removeAttribute('src');
             placeholder.style.display = 'block';
@@ -286,6 +308,32 @@
             container.style.borderStyle = 'dashed';
             container.style.borderColor = '#cbd5e1';
             container.style.backgroundColor = '#f8fafc';
+        }
+    }
+
+    function previewFotoProfil(input) {
+        const preview = document.getElementById('preview-foto-profil');
+        const placeholder = document.getElementById('placeholder-profil');
+        const container = document.getElementById('preview-container-profil');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.setAttribute('src', e.target.result);
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+                container.style.borderStyle = 'solid';
+                container.style.borderColor = '#10b981';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.style.display = 'none';
+            preview.removeAttribute('src');
+            placeholder.style.display = 'block';
+            container.style.borderStyle = 'dashed';
+            container.style.borderColor = '#cbd5e1';
         }
     }
 </script>

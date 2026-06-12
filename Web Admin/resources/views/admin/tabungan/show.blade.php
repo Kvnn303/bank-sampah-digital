@@ -69,7 +69,6 @@
 <div class="row justify-content-center">
     <div class="col-12 col-xl-11">
 
-        <!-- Header -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
             <div>
                 <h2 class="fw-bold mb-1 text-dark fs-2">Detail Setoran Sampah</h2>
@@ -86,10 +85,8 @@
 
         <div class="row g-4">
 
-            <!-- Kolom Kiri: Informasi Transaksi -->
             <div class="col-lg-7 col-xl-8">
 
-                <!-- Card Informasi Nasabah -->
                 <div class="card card-modern mb-4">
                     <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
                         <div class="icon-shape bg-blue-lt me-3">
@@ -155,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- Card Detail Sampah & Waktu -->
                 <div class="card card-modern">
                     <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
                         <div class="icon-shape bg-emerald-lt me-3">
@@ -166,7 +162,6 @@
                     <div class="card-body p-4">
 
                         <div class="row g-4 mb-4">
-                            <!-- Jenis Sampah -->
                             <div class="col-sm-6">
                                 <div class="text-slate-400 fw-semibold text-uppercase small mb-2" style="letter-spacing: 0.5px;">Jenis Sampah Disetor</div>
                                 <div class="d-flex align-items-center">
@@ -175,7 +170,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <!-- Kategori -->
                             <div class="col-sm-6">
                                 <div class="text-slate-400 fw-semibold text-uppercase small mb-2" style="letter-spacing: 0.5px;">Kategori Sampah</div>
                                 <div class="d-flex align-items-center">
@@ -184,7 +178,6 @@
                             </div>
                         </div>
 
-                        <!-- Waktu & Admin -->
                         <div class="bg-slate-50 border rounded-4 p-4">
                             <div class="row align-items-center g-3">
                                 <div class="col-sm-6">
@@ -227,13 +220,10 @@
 
             </div>
 
-            <!-- Kolom Kanan: Ringkasan Keuangan & Aksi -->
             <div class="col-lg-5 col-xl-4">
 
-                <!-- Card Total Uang (Highlight Gradient) -->
                 <div class="card card-modern border-0 mb-4" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
                     <div class="card-body p-4 text-center position-relative overflow-hidden">
-                        <!-- Dekorasi background -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="position-absolute top-0 end-0 opacity-10 mt-n3 me-n3" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></svg>
 
                         <div class="text-white text-uppercase fw-bold small mb-2" style="letter-spacing: 1px; opacity: 0.9;">Total Nilai Setoran</div>
@@ -246,7 +236,6 @@
                     </div>
                 </div>
 
-                <!-- Card Rincian Kalkulasi (Gaya Struk) -->
                 <div class="card card-modern mb-4 position-relative">
                     <div class="card-header bg-white border-bottom p-4">
                         <h3 class="card-title fw-bold text-dark m-0 fs-5 d-flex align-items-center">
@@ -274,15 +263,12 @@
                     </div>
                 </div>
 
-                <!-- Tombol Aksi Penuh -->
                 <div class="d-grid gap-3">
-                    <!-- Unduh Struk -->
-                    <a href="#" class="btn btn-outline-primary border-2 shadow-sm rounded-pill fw-bold py-2 d-flex align-items-center justify-content-center">
+                    <a href="{{ route('admin.tabungan.pdf', $tabungan->id) }}" target="_blank" class="btn btn-outline-primary border-2 shadow-sm rounded-pill fw-bold py-2 d-flex align-items-center justify-content-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                         Unduh Struk Setoran (PDF)
                     </a>
 
-                    <!-- Hapus / Batal -->
                     <form action="{{ route('admin.tabungan.destroy', $tabungan->id) }}" method="POST" onsubmit="return confirmDelete(event, '{{ $tabungan->tanggal_setor->format('d M Y') }}', '{{ addslashes($tabungan->nasabah->nama_lengkap ?? '') }}')">
                         @csrf
                         @method('DELETE')
@@ -323,7 +309,74 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                event.target.closest('form').submit();
+                const form = event.target.closest('form');
+
+                // Tampilkan loading
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(form.action, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                })
+                .then(response => {
+                    // Kalau response redirect (bukan JSON), handle redirect
+                    if (response.redirected || response.url !== form.action) {
+                        window.location.href = response.url || "{{ route('admin.tabungan.index') }}";
+                        return null;
+                    }
+
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Gagal menghapus data');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return; // Abort kalau redirect
+
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message,
+                            confirmButtonColor: '#10b981',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'rounded-pill fw-bold px-4',
+                                popup: 'rounded-4'
+                            }
+                        }).then(() => {
+                            window.location.href = "{{ route('admin.tabungan.index') }}";
+                        });
+                    } else {
+                        throw new Error(data.message || 'Terjadi kesalahan');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: error.message || 'Terjadi kesalahan saat menghapus data',
+                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'rounded-pill fw-bold px-4',
+                            popup: 'rounded-4'
+                        }
+                    });
+                });
             }
         });
 

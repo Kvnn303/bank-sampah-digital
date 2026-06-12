@@ -46,20 +46,44 @@ class Nasabah extends Model
         return $this->hasMany(Penarikan::class);
     }
 
-    // Hitung total saldo otomatis
-    public function getSaldoAttribute(): float
+    // Konstanta status penarikan yang mengurangi saldo
+    public const PENARIKAN_AKTIF_STATUS = ['selesai'];
+
+    // Core accessor: hitung saldo real-time, pakai withSum jika ada, fallback ke query
+    public function getSaldoRealtimeAttribute(): float
     {
+        // Jika sudah di-load via withSum, gunakan langsung (0 query tambahan)
+        if (array_key_exists('tabungan_sum_nilai_rupiah', $this->attributes)) {
+            $totalTabungan = (float) $this->attributes['tabungan_sum_nilai_rupiah'];
+            $totalPenarikan = (float) ($this->attributes['penarikan_aktif_sum_nominal'] ?? 0);
+
+            return $totalTabungan - $totalPenarikan;
+        }
+
+        // Fallback: hitung langsung (detail page, API, atau tanpa withSum)
         $totalTabungan = $this->tabungan()->sum('nilai_rupiah');
         $totalPenarikan = $this->penarikan()
-            ->whereIn('status', ['selesai', 'diproses'])
+            ->where('status', 'selesai')
             ->sum('nominal');
 
         return $totalTabungan - $totalPenarikan;
     }
 
+    // Alias backward-compat
+    public function getSaldoAktifAttribute(): float
+    {
+        return $this->getSaldoRealtimeAttribute();
+    }
+
     // Hitung total sampah terkumpul
     public function getTotalSampahAttribute(): float
     {
-        return $this->tabungan()->sum('berat_kg');
+        $totalSampah = (float) ($this->attributes['tabungan_sum_berat_kg'] ?? 0);
+
+        if ($totalSampah === 0.0 && !array_key_exists('tabungan_sum_berat_kg', $this->attributes)) {
+            $totalSampah = (float) $this->tabungan()->sum('berat_kg');
+        }
+
+        return $totalSampah;
     }
 }

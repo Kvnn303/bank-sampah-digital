@@ -235,8 +235,21 @@
                     <!-- Kolom Info Nasabah -->
                     <td>
                         <div class="d-flex align-items-center">
-                            <div class="avatar avatar-md me-3 rounded-circle border shadow-sm"
-                                 style="background-image: url({{ $n->foto ? asset('storage/'.$n->foto) : 'https://ui-avatars.com/api/?name='.urlencode($n->nama_lengkap).'&background=10b981&color=fff' }})">
+                            <div class="position-relative me-3">
+                                @if($n->foto)
+                                    <img src="{{ asset('storage/'.$n->foto) }}" alt="{{ $n->nama_lengkap }}"
+                                         class="rounded-circle border shadow-sm object-fit-cover"
+                                         style="width: 45px; height: 45px;">
+                                @else
+                                    <div class="rounded-circle border shadow-sm d-flex align-items-center justify-content-center fw-bold text-white"
+                                         style="width: 45px; height: 45px; background: linear-gradient(135deg, #10b981, #059669); font-size: 16px;">
+                                        {{ strtoupper(substr($n->nama_lengkap, 0, 1)) }}
+                                    </div>
+                                @endif
+                                @if($n->status_akun == 'active')
+                                    <span class="position-absolute rounded-circle bg-emerald border border-2 border-white"
+                                          style="width: 12px; height: 12px; bottom: 0; right: 0; transform: translate(25%, 25%);"></span>
+                                @endif
                             </div>
                             <div>
                                 <div class="fw-bold text-dark fs-5">{{ $n->nama_lengkap }}</div>
@@ -266,7 +279,7 @@
 
                     <!-- Kolom Saldo & Sampah -->
                     <td>
-                        <div class="fw-bold text-emerald fs-5">Rp {{ number_format($n->saldo) }}</div>
+                        <div class="fw-bold text-emerald fs-5">Rp {{ number_format($n->saldo_aktif) }}</div>
                         <div class="text-slate-500 small mt-1 fw-medium">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg>
                             {{ number_format($n->total_sampah, 1) }} kg Sampah

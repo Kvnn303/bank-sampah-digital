@@ -222,16 +222,34 @@
     <!-- Grafik Jenis Sampah -->
     <div class="col-lg-4">
         <div class="card card-modern">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title fw-bold m-0 text-dark">Komposisi Jenis Sampah</h3>
+                <span class="badge bg-slate-100 text-slate-600 border px-3 py-1 rounded-pill">Top 5</span>
             </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
+            <div class="card-body p-3">
                 @if($grafikJenis->count() > 0)
-                    <canvas id="grafikJenis" height="220"></canvas>
+                    <div style="position: relative; height: 200px;">
+                        <canvas id="grafikJenis"></canvas>
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="row g-2 text-center">
+                            @foreach($grafikJenis as $index => $gj)
+                            <div class="col-6 col-md-4 mb-2">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <span class="rounded-circle" style="width: 12px; height: 12px; background-color: {{ ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e'][$index] ?? '#06b6d4' }};"></span>
+                                    <div class="text-start">
+                                        <div class="small fw-semibold text-dark" style="font-size: 11px;">{{ Str::limit($gj->jenisSampah->nama ?? '-', 10) }}</div>
+                                        <div class="fw-bold text-muted" style="font-size: 12px;">{{ number_format($gj->total_kg, 1) }} kg</div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 @else
-                    <div class="text-center text-muted py-5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-slate-300" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="9"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><path d="M9.5 15.25a3.5 3.5 0 0 1 5 0"/></svg>
-                        <p class="m-0">Belum ada data komposisi sampah</p>
+                    <div class="text-center text-muted py-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-slate-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+                        <p class="mb-0 small">Belum ada data komposisi sampah</p>
                     </div>
                 @endif
             </div>
@@ -298,8 +316,83 @@
 
 </div>
 
-<!-- Baris 4: Tabel Terbaru -->
-<div class="row row-deck row-cards">
+<!-- Baris 4: Stok Sampah & Tabel Terbaru -->
+<div class="row row-deck row-cards mb-4">
+
+    <!-- Stok Tersedia untuk Publik -->
+    <div class="col-lg-5">
+        <div class="card card-modern border-success" style="border-top-width: 3px;">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottom p-4">
+                <h3 class="card-title fw-bold m-0 text-dark">Stok Siap Dijual</h3>
+                <a href="{{ route('admin.stok-sampah.index') }}" class="btn btn-sm btn-light fw-semibold text-emerald rounded-pill px-3">
+                    Kelola
+                </a>
+            </div>
+            <div class="card-body p-4">
+                {{-- Statistik Singkat --}}
+                <div class="row g-2 mb-3">
+                    <div class="col-4 text-center">
+                        <div class="fw-bold fs-4 text-emerald">{{ number_format($stokStats['total_tersisa_kg'] ?? 0, 1) }}</div>
+                        <div class="text-muted small">kg Tersisa</div>
+                    </div>
+                    <div class="col-4 text-center border-start border-end">
+                        <div class="fw-bold fs-4 text-purple">{{ $stokStats['published_count'] ?? 0 }}</div>
+                        <div class="text-muted small">Published</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="fw-bold fs-4 text-amber">Rp {{ number_format($stokStats['total_pendapatan'] ?? 0, 0, ',', '.') }}</div>
+                        <div class="text-muted small">Pendapatan</div>
+                    </div>
+                </div>
+                {{-- Link ke Halaman Publik --}}
+                <div class="text-center mb-3">
+                    <a href="{{ route('publik.stok') }}" target="_blank" class="btn btn-success btn-sm rounded-pill fw-bold px-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        Lihat di Website Publik
+                    </a>
+                </div>
+                {{-- Daftar Stok --}}
+                <div class="table-responsive">
+                    <table class="table table-hover table-modern align-middle mb-0">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="ps-3">Jenis Sampah</th>
+                                <th class="text-center">Tersisa</th>
+                                <th class="text-center pe-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($stokTersediaDashboard as $stok)
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-bold text-dark small">{{ $stok->jenisSampah->nama ?? '-' }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Rp {{ number_format($stok->harga_jual_per_kg, 0, ',', '.') }}/kg</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-emerald-lt text-emerald badge-modern rounded-pill">
+                                        {{ number_format($stok->stok_tersisa_kg, 1) }} kg
+                                    </span>
+                                </td>
+                                <td class="text-center pe-3">
+                                    <span class="badge {{ $stok->is_pres ? 'bg-purple-lt text-purple' : 'bg-slate-100 text-slate-500' }} badge-modern rounded-pill">
+                                        {{ $stok->is_pres ? 'PRESS' : 'Draft' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-slate-300 mb-1"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg>
+                                    <br>Belum ada stok tersedia
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Tabungan Terbaru -->
     <div class="col-lg-7">
@@ -455,20 +548,25 @@
             labels: @json($grafikJenis->pluck('jenisSampah.nama')),
             datasets: [{
                 data: @json($grafikJenis->pluck('total_kg')),
-                backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e', '#06b6d4'],
-                borderWidth: 3,
-                borderColor: '#ffffff',
+                backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e'],
+                borderWidth: 0,
                 hoverOffset: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '60%',
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((context.raw / total) * 100).toFixed(1);
+                            return context.raw + ' kg (' + pct + '%)';
+                        }
+                    }
                 }
             }
         }

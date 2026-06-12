@@ -11,8 +11,8 @@ class AuditLogService
         string $action,
         string $module,
         string $description = '',
-        array  $oldData = null,
-        array  $newData = null,
+        ?array $oldData = null,
+        ?array $newData = null,
         string $status = 'success'
     ): void {
         $user = Auth::user();

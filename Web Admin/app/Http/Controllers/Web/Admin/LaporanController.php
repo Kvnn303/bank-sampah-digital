@@ -30,7 +30,7 @@ class LaporanController extends Controller
             'total_sampah_kg'    => Tabungan::sum('berat_kg'),
             'total_nilai'        => Tabungan::sum('nilai_rupiah'),
             'total_dicairkan'    => Penarikan::where('status', 'selesai')->sum('nominal'),
-            'saldo_tersisa'      => Tabungan::sum('nilai_rupiah') - Penarikan::whereIn('status', ['selesai', 'diproses'])->sum('nominal'),
+            'saldo_tersisa'      => Tabungan::sum('nilai_rupiah') - Penarikan::where('status', 'selesai')->sum('nominal'),
             'penarikan_pending'  => Penarikan::where('status', 'pending')->count(),
         ];
 
@@ -385,7 +385,7 @@ class LaporanController extends Controller
                 'Sumber Daftar'         => $n->sumber_daftar == 'admin' ? 'Input Admin' : 'Daftar Sendiri',
                 'Total Sampah (kg)'     => (float) $n->total_sampah,
                 'Total Tabungan (Rp)'   => (float) $n->tabungan->sum('nilai_rupiah'),
-                'Total Penarikan (Rp)'  => (float) $n->penarikan->whereIn('status', ['selesai', 'diproses'])->sum('nominal'),
+                'Total Penarikan (Rp)'  => (float) $n->penarikan->where('status', 'selesai')->sum('nominal'),
                 'Saldo Aktif (Rp)'      => (float) $n->saldo,
             ];
         });

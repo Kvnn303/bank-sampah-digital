@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Nasabah;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tabungan;
+use App\Models\Penarikan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SaldoController extends Controller
 {
@@ -20,11 +22,21 @@ class SaldoController extends Controller
             ], 404);
         }
 
+        // Hitung Saldo Real-time langsung dari DB
+        // Penarikan yang mengurangi saldo: HANYA yang sudah 'selesai'
+        $totalTabungan = (float) Tabungan::where('nasabah_id', $nasabah->id)->sum('nilai_rupiah');
+        $totalPenarikan = (float) Penarikan::where('nasabah_id', $nasabah->id)
+                            ->where('status', 'selesai')
+                            ->sum('nominal');
+
+        $saldoAktif = $totalTabungan - $totalPenarikan;
+        $totalSampah = (float) Tabungan::where('nasabah_id', $nasabah->id)->sum('berat_kg');
+
         return response()->json([
-            'nama'         => $nasabah->nama_lengkap,
-            'status_akun'  => $nasabah->status_akun,
-            'saldo'        => $nasabah->saldo,
-            'total_sampah' => $nasabah->total_sampah,
+            'nama'              => $nasabah->nama_lengkap,
+            'status_akun'       => $nasabah->status_akun,
+            'saldo'             => (float) $saldoAktif,
+            'total_sampah'      => $totalSampah,
             'tanggal_bergabung' => $nasabah->tanggal_bergabung,
         ]);
     }
@@ -64,13 +76,20 @@ class SaldoController extends Controller
                     ->orderByDesc('total_kg')
                     ->get();
 
+        // Hitung ulang saldo untuk response statistik
+        $totalTabungan = (float) Tabungan::where('nasabah_id', $nasabah->id)->sum('nilai_rupiah');
+        $totalPenarikan = (float) Penarikan::where('nasabah_id', $nasabah->id)
+                            ->where('status', 'selesai')
+                            ->sum('nominal');
+        $saldoAktif = $totalTabungan - $totalPenarikan;
+
         return response()->json([
             'nasabah'    => $nasabah->nama_lengkap,
-            'saldo'      => $nasabah->saldo,
+            'saldo'      => (float) $saldoAktif,
             'statistik'  => [
-                'hari_ini'  => $hariIni . ' kg',
-                'bulan_ini' => $bulanIni . ' kg',
-                'tahun_ini' => $tahunIni . ' kg',
+                'hari_ini'  => (float) $hariIni . ' kg',
+                'bulan_ini' => (float) $bulanIni . ' kg',
+                'tahun_ini' => (float) $tahunIni . ' kg',
                 'per_jenis' => $perJenis,
             ]
         ]);

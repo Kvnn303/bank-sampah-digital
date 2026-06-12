@@ -59,6 +59,16 @@
         font-weight: 600;
         letter-spacing: 0.3px;
     }
+
+    .icon-bg-lg {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.25rem;
+    }
 </style>
 @endpush
 
@@ -75,14 +85,14 @@
             <div class="d-flex flex-wrap gap-2">
                 @if($unreadCount > 0)
                     <button type="button" class="btn btn-primary rounded-pill fw-bold shadow-sm px-4 d-flex align-items-center" onclick="markAllRead()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <x-icon name="check" size="18" class="me-2" />
                         Tandai Semua Dibaca
                     </button>
                 @endif
 
                 @if(\App\Models\Notification::read()->exists())
                     <button type="button" class="btn btn-light border-rose text-rose rounded-pill fw-bold shadow-sm px-4 d-flex align-items-center hover-danger" onclick="clearRead()" style="transition: all 0.2s;">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <x-icon name="trash" size="18" class="me-2" />
                         Hapus yang Dibaca
                     </button>
                 @endif
@@ -99,7 +109,7 @@
                             <!-- Icon -->
                             <div class="d-flex align-items-center justify-content-center flex-shrink-0">
                                 <div class="avatar avatar-md rounded-circle shadow-sm border border-2 border-white {{ $notif->getIconBgClass() }}" style="width: 48px; height: 48px;">
-                                    {!! $notif->getIconSvg() !!}
+                                    <x-icon name="{{ $notif->getIconName() }}" size="20" />
                                 </div>
                             </div>
 
@@ -118,7 +128,7 @@
                                 </p>
                                 <div class="d-flex align-items-center flex-wrap gap-2">
                                     <span class="text-slate-400 small fw-medium d-flex align-items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                        <x-icon name="calendar" size="14" class="me-1" />
                                         {{ $notif->created_at->translatedFormat('d M Y, H:i') }}
                                     </span>
                                     <span class="text-slate-300 d-none d-sm-inline">•</span>
@@ -137,18 +147,18 @@
                             <div class="d-flex flex-row flex-sm-column gap-2 ms-sm-3 mt-3 mt-sm-0 pt-3 pt-sm-0 border-top border-sm-top-0 border-slate-100 justify-content-end">
                                 @if(!$notif->is_read)
                                     <button type="button" class="btn btn-light btn-action-icon text-emerald border shadow-sm" onclick="markRead('{{ $notif->id }}')" data-bs-toggle="tooltip" title="Tandai dibaca">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                        <x-icon name="check" size="18" />
                                     </button>
                                 @endif
 
                                 @if($notif->url)
                                     <a href="{{ $notif->url }}" class="btn btn-light btn-action-icon text-blue-modern border shadow-sm" data-bs-toggle="tooltip" title="Lihat detail">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                        <x-icon name="arrow-right" size="18" />
                                     </a>
                                 @endif
 
                                 <button type="button" class="btn btn-light btn-action-icon text-rose border shadow-sm hover-bg-rose" onclick="deleteNotif('{{ $notif->id }}')" data-bs-toggle="tooltip" title="Hapus">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                    <x-icon name="trash" size="18" />
                                 </button>
                             </div>
 
@@ -157,7 +167,7 @@
                 @empty
                     <div class="list-group-item text-center py-5 border-0">
                         <div class="mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg text-slate-300" width="64" height="64" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></svg>
+                            <x-icon name="bell-off" size="64" class="text-slate-300" />
                         </div>
                         <h4 class="text-dark fw-bold fs-4">Tidak Ada Notifikasi</h4>
                         <p class="text-slate-500 mb-0">Semua pemberitahuan sudah Anda baca atau dihapus.</p>

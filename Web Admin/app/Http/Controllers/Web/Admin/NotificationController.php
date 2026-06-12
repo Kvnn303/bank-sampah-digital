@@ -8,25 +8,34 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-
+    /**
+     * Tampilkan semua notifikasi.
+     */
     public function index(Request $request)
     {
+        $adminId = auth()->id();
+
         // AJAX fetch dari navbar — kembalikan HTML partial + unread count
         if ($request->ajax() || $request->wantsJson()) {
-            $notifications = Notification::latest()->take(10)->get();
+            $notifications = Notification::forAdmin($adminId)
+                                    ->latest()
+                                    ->take(10)
+                                    ->get();
 
             $html = view('admin.notifikasi._partial-list', compact('notifications'))->render();
 
             return response()->json([
                 'success'      => true,
                 'html'         => $html,
-                'unread_count' => Notification::unread()->count(),
+                'unread_count' => Notification::forAdmin($adminId)->unread()->count(),
             ]);
         }
 
         // Halaman penuh
-        $notifications = Notification::latest()->paginate(15);
-        $unreadCount   = Notification::unread()->count();
+        $notifications = Notification::forAdmin($adminId)
+                                ->latest()
+                                ->paginate(15);
+        $unreadCount = Notification::forAdmin($adminId)->unread()->count();
 
         return view('admin.notifikasi.index', compact('notifications', 'unreadCount'));
     }
@@ -37,10 +46,17 @@ class NotificationController extends Controller
     public function markAsRead(string $id)
     {
         $notif = Notification::findOrFail($id);
+        $adminId = auth()->id();
 
-        if (! $notif->is_read) {
+        // Pastikan notifikasi ini milik admin
+        if ($notif->target_role !== 'admin' || ($notif->user_id !== null && $notif->user_id !== $adminId)) {
+            abort(403, 'Unauthorized');
+        }
+
+        if (!$notif->is_read) {
             $notif->update([
                 'is_read' => true,
+                'status'  => Notification::STATUS_READ,
                 'read_at' => now(),
             ]);
         }
@@ -48,7 +64,7 @@ class NotificationController extends Controller
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json([
                 'success'      => true,
-                'unread_count' => Notification::unread()->count(),
+                'unread_count' => Notification::forAdmin($adminId)->unread()->count(),
             ]);
         }
 
@@ -60,8 +76,11 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
-        Notification::unread()->update([
+        $adminId = auth()->id();
+
+        Notification::forAdmin($adminId)->unread()->update([
             'is_read' => true,
+            'status'  => Notification::STATUS_READ,
             'read_at' => now(),
         ]);
 
@@ -80,7 +99,15 @@ class NotificationController extends Controller
      */
     public function destroy(string $id)
     {
-        Notification::findOrFail($id)->delete();
+        $notif = Notification::findOrFail($id);
+        $adminId = auth()->id();
+
+        // Pastikan notifikasi ini milik admin
+        if ($notif->target_role !== 'admin' || ($notif->user_id !== null && $notif->user_id !== $adminId)) {
+            abort(403, 'Unauthorized');
+        }
+
+        $notif->delete();
 
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json(['success' => true]);
@@ -94,12 +121,22 @@ class NotificationController extends Controller
      */
     public function destroyRead()
     {
-        Notification::read()->delete();
+        $adminId = auth()->id();
+
+        Notification::forAdmin($adminId)->read()->delete();
 
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json(['success' => true]);
         }
 
         return back()->with('success', 'Notifikasi yang sudah dibaca telah dihapus.');
+    }
+
+    /**
+     * Hapus semua notifikasi yang sudah dibaca (alias).
+     */
+    public function clearRead()
+    {
+        return $this->destroyRead();
     }
 }

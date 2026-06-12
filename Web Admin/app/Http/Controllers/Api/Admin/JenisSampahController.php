@@ -7,10 +7,12 @@ use App\Models\JenisSampah;
 use App\Models\RiwayatHargaSampah;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
+use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
 
 class JenisSampahController extends Controller
 {
+    use NotifiableTrait;
     // GET semua jenis sampah
     public function index()
     {
@@ -72,7 +74,7 @@ class JenisSampahController extends Controller
             newData: $sampah->toArray()
         );
 
-        // ✅ Notif kalau status aktif/nonaktif berubah
+        // ✅ Notif kalau status aktif/nonaktif berubah (ke Admin)
         if ($sampah->wasChanged('is_active')) {
             if ($sampah->is_active) {
                 NotificationService::sampahDiaktifkan($sampah->nama);
@@ -118,10 +120,17 @@ class JenisSampahController extends Controller
             newData: ['harga_per_kg' => $request->harga_per_kg]
         );
 
-        // Notif ke admin
         $old = 'Rp' . number_format($hargaLama, 0, ',', '.');
         $new = 'Rp' . number_format($request->harga_per_kg, 0, ',', '.');
+
+        // ✅ Notif ke admin
         NotificationService::sampahDiubah($sampah->nama, $old, $new);
+
+        // 🔔 PERBAIKAN: Notif MASSAL ke Seluruh Nasabah
+        NotificationService::hargaSampahBerubahNasabah($sampah->nama, $new);
+
+        // 🔔 TRIGGER MOBILE BANKING: Notifikasi harga sampah berubah
+        $this->notifyHargaBerubah($sampah->nama, $new);
 
         return response()->json([
             'message'    => 'Harga berhasil diperbarui',

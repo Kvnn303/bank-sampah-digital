@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -15,62 +16,50 @@ class NotificationController extends Controller
 
     /**
      * GET /api/notifications
+     * Mengembalikan seluruh notifikasi milik user yang sedang login (terbaru dulu).
      */
-    public function index(Request $request)
+    public function index(): JsonResponse
     {
-        $nasabahId = auth()->id();
-        $query = Notification::forNasabah($nasabahId);
-
-        if ($request->has('page')) {
-            $notifications = $query->latest()->paginate(10);
-        } else {
-            $notifications = $query->latest()->take(10)->get();
-        }
+        $notifications = Notification::where('user_id', auth()->id())
+            ->latest()
+            ->get();
 
         return response()->json([
-            'success'      => true,
-            'data'         => $notifications,
-            'unread_count' => Notification::forNasabah($nasabahId)->unread()->count(),
+            'data' => $notifications,
         ]);
     }
 
     /**
      * POST /api/notifications/{id}/read
+     * Mengubah is_read = true dan read_at = now() untuk satu notifikasi.
      */
-    public function markAsRead(string $id)
+    public function markAsRead(string $id): JsonResponse
     {
-        $notif = Notification::forNasabah(auth()->id())->findOrFail($id);
+        $notif = Notification::where('user_id', auth()->id())->find($id);
 
-        if (! $notif->is_read) {
-            $notif->update(['is_read' => true, 'read_at' => now()]);
+        if (!$notif) {
+            return response()->json(['message' => 'Notifikasi tidak ditemukan'], 404);
         }
 
+        $notif->markAsRead();
+
         return response()->json([
-            'success'      => true,
-            'unread_count' => Notification::forNasabah(auth()->id())->unread()->count(),
+            'message' => 'Notifikasi ditandai sudah dibaca',
         ]);
     }
 
     /**
      * POST /api/notifications/read-all
+     * Mengubah semua is_read = true untuk seluruh notifikasi milik user yang belum dibaca.
      */
-    public function markAllAsRead()
+    public function markAllAsRead(): JsonResponse
     {
-        Notification::forNasabah(auth()->id())->unread()->update([
-            'is_read' => true,
-            'read_at' => now(),
+        $updated = Notification::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+
+        return response()->json([
+            'message' => "{$updated} notifikasi ditandai sudah dibaca",
         ]);
-
-        return response()->json(['success' => true, 'unread_count' => 0]);
-    }
-
-    /**
-     * DELETE /api/notifications/{id}
-     */
-    public function destroy(string $id)
-    {
-        Notification::forNasabah(auth()->id())->findOrFail($id)->delete();
-
-        return response()->json(['success' => true]);
     }
 }

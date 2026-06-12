@@ -196,9 +196,9 @@
                         <a href="{{ route('admin.jenis-sampah.index') }}" class="btn btn-light border shadow-sm rounded-pill fw-semibold px-4 d-none d-sm-block">
                             Batal
                         </a>
-                        <button type="submit" class="btn btn-primary shadow-sm rounded-pill fw-bold px-4 d-flex align-items-center w-100 w-sm-auto justify-content-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                            Simpan Data
+                        <button type="submit" id="btnSimpan" class="btn btn-primary shadow-sm rounded-pill fw-bold px-4 d-flex align-items-center w-100 w-sm-auto justify-content-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" id="iconSimpan" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            <span id="textSimpan">Simpan Data</span>
                         </button>
                     </div>
 
@@ -210,3 +210,29 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+// Visual feedback saat submit form
+document.querySelector('form').addEventListener('submit', function(e) {
+    const btn = document.getElementById('btnSimpan');
+    const icon = document.getElementById('iconSimpan');
+    const text = document.getElementById('textSimpan');
+
+    if (btn && icon && text) {
+        btn.disabled = true;
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-primary');
+
+        // Ganti ikon dengan checkmark
+        icon.innerHTML = '<circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>';
+        text.textContent = 'Menyimpan...';
+
+        // Setelah 1 detik tampilkan "Selesai"
+        setTimeout(() => {
+            text.textContent = 'Selesai!';
+        }, 1000);
+    }
+});
+</script>
+@endpush

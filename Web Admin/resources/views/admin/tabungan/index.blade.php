@@ -190,11 +190,11 @@
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label text-muted fw-semibold small">Dari Tanggal</label>
-                        <input type="date" name="dari_tanggal" class="form-control" value="{{ request('dari_tanggal') }}">
+                        <input type="date" name="dari_tanggal" id="dari_tanggal" class="form-control" value="{{ request('dari_tanggal') }}">
                     </div>
                     <div class="col-6 col-md-2">
                         <label class="form-label text-muted fw-semibold small">Sampai Tanggal</label>
-                        <input type="date" name="sampai_tanggal" class="form-control" value="{{ request('sampai_tanggal') }}">
+                        <input type="date" name="sampai_tanggal" id="sampai_tanggal" class="form-control" value="{{ request('sampai_tanggal') }}">
                     </div>
                     <div class="col-12 col-md-2 d-flex gap-2">
                         <button type="submit" class="btn btn-secondary flex-grow-1 text-white shadow-sm fw-semibold">
@@ -297,14 +297,12 @@
                                 <li><hr class="dropdown-divider my-1 border-slate-100"></li>
                                 <li>
                                     <!-- Tombol HAPUS -->
-                                    <form method="POST" action="{{ route('admin.tabungan.destroy', $t->id) }}" onsubmit="return confirmDelete(event, '{{ $t->tanggal_setor->format('d M Y') }}', '{{ addslashes($t->nasabah->nama_lengkap ?? '') }}')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                            Batalkan Setoran
-                                        </button>
-                                    </form>
+                                    <a href="javascript:void(0)"
+                                       class="dropdown-item d-flex align-items-center text-rose fw-semibold"
+                                       onclick="hapusSetoran('{{ route('admin.tabungan.destroy', $t->id) }}', '{{ addslashes($t->nasabah->nama_lengkap ?? '') }}', '{{ $t->tanggal_setor->format('d M Y') }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                        Batalkan Setoran
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -346,9 +344,42 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function confirmDelete(event, tanggal, nama) {
-        event.preventDefault();
+    // Validasi date range filter
+    document.addEventListener('DOMContentLoaded', function() {
+        const dariTanggal = document.getElementById('dari_tanggal');
+        const sampaiTanggal = document.getElementById('sampai_tanggal');
 
+        if (dariTanggal && sampaiTanggal) {
+            dariTanggal.addEventListener('change', function() {
+                if (this.value && sampaiTanggal.value) {
+                    if (this.value > sampaiTanggal.value) {
+                        sampaiTanggal.value = this.value;
+                    }
+                }
+                sampaiTanggal.min = this.value;
+            });
+
+            sampaiTanggal.addEventListener('change', function() {
+                if (this.value && dariTanggal.value) {
+                    if (this.value < dariTanggal.value) {
+                        dariTanggal.value = this.value;
+                    }
+                }
+                dariTanggal.max = this.value;
+            });
+
+            // Set initial constraints
+            if (dariTanggal.value) {
+                sampaiTanggal.min = dariTanggal.value;
+            }
+            if (sampaiTanggal.value) {
+                dariTanggal.max = sampaiTanggal.value;
+            }
+        }
+    });
+
+    // Konfirmasi Hapus via AJAX SweetAlert2
+    function hapusSetoran(url, nama, tanggal) {
         Swal.fire({
             title: 'Batalkan Setoran?',
             html: `Apakah Anda yakin ingin menghapus data setoran atas nama <strong class="text-dark">${nama}</strong> tanggal <strong class="text-dark">${tanggal}</strong>?<br><small class="text-muted mt-2 d-block">Saldo nasabah akan otomatis disesuaikan kembali.</small>`,
@@ -366,11 +397,66 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                event.target.closest('form').submit();
+                // Tampilkan loading
+                Swal.fire({
+                    title: 'Menghapus...',
+                    text: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Gagal menghapus data');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message,
+                            confirmButtonColor: '#10b981',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'rounded-pill fw-bold px-4',
+                                popup: 'rounded-4'
+                            }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Terjadi kesalahan');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: error.message || 'Terjadi kesalahan saat menghapus data',
+                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'rounded-pill fw-bold px-4',
+                            popup: 'rounded-4'
+                        }
+                    });
+                });
             }
         });
-
-        return false;
     }
 </script>
 @endpush

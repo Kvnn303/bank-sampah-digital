@@ -9,30 +9,51 @@ use App\Services\AuditLogService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class NasabahController extends Controller
 {
     // Tampilkan semua nasabah
     public function index(Request $request)
     {
-        $query = Nasabah::with('user')->orderByDesc('created_at');
+        // Load saldo real-time via subquery (HANYA 3 query total, anti N+1):
+        // 1) SELECT nasabah + with('user')
+        // 2) SELECT SUM(nilai_rupiah), SUM(berat_kg) GROUP BY nasabah_id
+        // 3) SELECT SUM(nominal) WHERE status IN (...) GROUP BY nasabah_id
+        $query = Nasabah::with('user')
+            ->withSum([
+                'tabungan as tabungan_sum_nilai_rupiah' => function ($q) {
+                    $q->select(DB::raw('COALESCE(SUM(nilai_rupiah), 0)'));
+                },
+                'tabungan as tabungan_sum_berat_kg' => function ($q) {
+                    $q->select(DB::raw('COALESCE(SUM(berat_kg), 0)'));
+                },
+            ], null)
+            ->withSum([
+                'penarikan as penarikan_aktif_sum_nominal' => function ($q) {
+                    $q->select(DB::raw('COALESCE(SUM(nominal), 0)'))
+                      ->where('status', 'selesai');
+                },
+            ], null)
+            ->orderByDesc('nasabah.created_at');
 
         // Filter by status
         if ($request->status) {
-            $query->where('status_akun', $request->status);
+            $query->where('nasabah.status_akun', $request->status);
         }
 
         // Filter by sumber
         if ($request->sumber) {
-            $query->where('sumber_daftar', $request->sumber);
+            $query->where('nasabah.sumber_daftar', $request->sumber);
         }
 
         // Search
         if ($request->search) {
             $query->where(function($q) use ($request) {
-                $q->where('nama_lengkap', 'like', "%{$request->search}%")
-                  ->orWhere('no_ktp', 'like', "%{$request->search}%")
-                  ->orWhere('no_telepon', 'like', "%{$request->search}%");
+                $q->where('nasabah.nama_lengkap', 'like', "%{$request->search}%")
+                  ->orWhere('nasabah.no_ktp', 'like', "%{$request->search}%")
+                  ->orWhere('nasabah.no_telepon', 'like', "%{$request->search}%");
             });
         }
 
@@ -79,17 +100,26 @@ class NasabahController extends Controller
             'no_ktp'       => 'nullable|string|unique:nasabah',
             'alamat'       => 'nullable|string',
             'foto_ktp'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi',
             'email.required'        => 'Email wajib diisi',
             'email.unique'          => 'Email sudah terdaftar',
             'no_ktp.unique'         => 'No KTP sudah terdaftar',
+            'foto.image'            => 'File harus berupa gambar',
+            'foto.max'              => 'Ukuran foto maksimal 2MB',
         ]);
 
         // Simpan foto KTP
         $fotoKtpPath = null;
         if ($request->hasFile('foto_ktp')) {
             $fotoKtpPath = $request->file('foto_ktp')->store('foto_ktp', 'public');
+        }
+
+        // Simpan foto profil
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('foto-nasabah', 'public');
         }
 
         // Password default
@@ -112,6 +142,7 @@ class NasabahController extends Controller
             'no_telepon'       => $request->no_telepon,
             'no_ktp'           => $request->no_ktp,
             'foto_ktp'         => $fotoKtpPath,
+            'foto'             => $fotoPath,
             'status_akun'      => 'verified',
             'sumber_daftar'    => 'admin',
             'tanggal_bergabung'=> now()->toDateString(),
@@ -123,7 +154,7 @@ class NasabahController extends Controller
             description: "Admin menambahkan nasabah: {$nasabah->nama_lengkap}",
         );
 
-        // ✅ Notif ke admin
+        // Notif ke admin
         NotificationService::nasabahBaru($nasabah->nama_lengkap);
 
         return redirect()->route('admin.nasabah.index')
@@ -146,13 +177,28 @@ class NasabahController extends Controller
             'nama_lengkap'  => 'nullable|string',
             'alamat'        => 'nullable|string',
             'no_telepon'    => 'nullable|string',
+            'no_ktp'        => 'nullable|string|unique:nasabah,no_ktp,' . $nasabah->id,
             'status_akun'   => 'nullable|in:pending,verified,active,nonaktif',
             'catatan_admin' => 'nullable|string',
+            'foto'          => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'no_ktp.unique' => 'No KTP sudah terdaftar',
+            'foto.image'    => 'File harus berupa gambar',
+            'foto.max'      => 'Ukuran foto maksimal 2MB',
         ]);
+
+        // Handle upload foto profil baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($nasabah->foto && Storage::disk('public')->exists($nasabah->foto)) {
+                Storage::disk('public')->delete($nasabah->foto);
+            }
+            $nasabah->foto = $request->file('foto')->store('foto-nasabah', 'public');
+        }
 
         $nasabah->update($request->only([
             'nama_lengkap', 'alamat',
-            'no_telepon', 'status_akun', 'catatan_admin'
+            'no_telepon', 'no_ktp', 'status_akun', 'catatan_admin'
         ]));
 
         AuditLogService::log(
@@ -182,7 +228,7 @@ class NasabahController extends Controller
             description: "Admin memverifikasi nasabah: {$nasabah->nama_lengkap}",
         );
 
-        // ✅ Notif ke admin + nasabah
+        // Notif ke admin + nasabah
         if ($status === 'verified' || $status === 'active') {
             NotificationService::nasabahVerifikasi($nasabah->nama_lengkap);
             NotificationService::akunDiverifikasi($nasabah->user_id);
@@ -204,7 +250,7 @@ class NasabahController extends Controller
             description: "Admin menonaktifkan nasabah: {$nasabah->nama_lengkap}",
         );
 
-        // ✅ Notif ke admin + nasabah
+        // Notif ke admin + nasabah
         NotificationService::nasabahNonaktif($nasabah->nama_lengkap);
         NotificationService::akunDinonaktifkan($nasabah->user_id);
 
@@ -224,7 +270,7 @@ class NasabahController extends Controller
             description: "Admin mengaktifkan kembali nasabah: {$nasabah->nama_lengkap}",
         );
 
-        // ✅ Notif ke admin
+        // Notif ke admin
         NotificationService::nasabahAktifkan($nasabah->nama_lengkap);
 
         return redirect()->route('admin.nasabah.index')

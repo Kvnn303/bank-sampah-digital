@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Penarikan;
 use App\Models\Nasabah;
+use App\Models\Tabungan;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
+use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
+use Carbon\Carbon; // ✅ PERBAIKAN: Import Carbon
 
 class PenarikanController extends Controller
 {
+    use NotifiableTrait;
     // GET semua pengajuan penarikan
     public function index(Request $request)
     {
@@ -53,12 +57,24 @@ class PenarikanController extends Controller
             ], 400);
         }
 
-        // Cek saldo nasabah cukup
         $nasabah = $penarikan->nasabah;
-        if ($nasabah->saldo < $penarikan->nominal) {
+
+        // ✅ PERBAIKAN: Hitung saldo manual agar tidak Error 500 ($nasabah->saldo tidak ada di database)
+        $totalTabungan = Tabungan::where('nasabah_id', $nasabah->id)->sum('nilai_rupiah');
+
+        // Hitung penarikan lain yang sudah selesai (selain ID ini)
+        $totalPenarikanLain = Penarikan::where('nasabah_id', $nasabah->id)
+                                ->where('status', 'selesai')
+                                ->where('id', '!=', $penarikan->id)
+                                ->sum('nominal');
+
+        $saldoTersedia = $totalTabungan - $totalPenarikanLain;
+
+        // Cek saldo nasabah cukup
+        if ($saldoTersedia < $penarikan->nominal) {
             return response()->json([
                 'message' => 'Saldo nasabah tidak mencukupi',
-                'saldo'   => $nasabah->saldo,
+                'saldo'   => $saldoTersedia,
                 'nominal' => $penarikan->nominal,
             ], 400);
         }
@@ -80,9 +96,8 @@ class PenarikanController extends Controller
             newData: ['status' => 'diproses']
         );
 
-        // ✅ Notif ke admin (log) + nasabah
-        NotificationService::penarikanSelesai($nasabah->nama_lengkap, $nominal);
-        NotificationService::penarikanDisetujuiNasabah($nasabah->user_id, $nominal);
+        // 🔔 TRIGGER MOBILE BANKING: Notifikasi transaksi disetujui → Status ACC
+        $this->notifyPenarikanDisetujui($nasabah->user_id, $nominal);
 
         return response()->json([
             'message'   => 'Penarikan berhasil disetujui',
@@ -107,7 +122,9 @@ class PenarikanController extends Controller
         ]);
 
         $nominal = 'Rp' . number_format($penarikan->nominal, 0, ',', '.');
-        $tanggal = $penarikan->tanggal_ambil ? $penarikan->tanggal_ambil->format('d M Y') : '-';
+
+        // ✅ PERBAIKAN: Gunakan Carbon::parse agar aman dari error to string format
+        $tanggal = $penarikan->tanggal_ambil ? Carbon::parse($penarikan->tanggal_ambil)->format('d M Y') : '-';
 
         AuditLogService::log(
             action: 'PENARIKAN_SELESAI',
@@ -117,9 +134,8 @@ class PenarikanController extends Controller
             newData: ['status' => 'selesai']
         );
 
-        //  Notif ke admin (log) + nasabah
-        NotificationService::penarikanSelesai($penarikan->nasabah->nama_lengkap, $nominal);
-        NotificationService::penarikanSelesaiNasabah($penarikan->nasabah->user_id, $nominal, $tanggal);
+        // 🔔 TRIGGER MOBILE BANKING: Notifikasi transaksi berhasil dicairkan → Status Selesai
+        $this->notifyPenarikanSelesai($penarikan->nasabah->user_id, $nominal, $tanggal);
 
         return response()->json([
             'message'   => 'Penarikan selesai, uang sudah diterima nasabah',
@@ -159,9 +175,11 @@ class PenarikanController extends Controller
             newData: ['status' => 'ditolak']
         );
 
-        // ✅ Notif ke admin (log) + nasabah
+        // Notif ke admin (log notifikasi panel admin)
         NotificationService::penarikanDitolak($penarikan->nasabah->nama_lengkap, $nominal);
-        NotificationService::penarikanDitolakNasabah($penarikan->nasabah->user_id, $nominal, $request->alasan_penolakan);
+
+        // 🔔 TRIGGER MOBILE BANKING: Notifikasi transaksi ditolak ke Nasabah
+        $this->notifyPenarikanDitolak($penarikan->nasabah->user_id, $nominal, $request->alasan_penolakan);
 
         return response()->json([
             'message'   => 'Penarikan berhasil ditolak',

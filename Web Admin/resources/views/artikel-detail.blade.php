@@ -100,6 +100,34 @@
         .article-content a { color: var(--primary); font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.3s; }
         .article-content a:hover { border-color: var(--primary); }
 
+        /* ===== GALERI ARTIKEL ===== */
+        .article-gallery { max-width: 1000px; margin: 3rem auto 0; padding: 0 2rem; }
+        .gallery-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--dark); font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .gallery-title-badge { background: rgba(16, 185, 129, 0.1); color: var(--primary-dark); padding: 4px 12px; border-radius: 50rem; font-size: 0.8rem; font-weight: 700; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+        .gallery-item { position: relative; border-radius: 18px; overflow: hidden; background: white; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; cursor: pointer; aspect-ratio: 4/3; transition: 0.3s; }
+        .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(16, 185, 129, 0.12); border-color: #d1fae5; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+        .gallery-item:hover img { transform: scale(1.06); }
+        .gallery-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 0.9rem 1rem; background: linear-gradient(0deg, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0) 100%); color: white; font-size: 0.85rem; font-weight: 600; line-height: 1.3; opacity: 0; transition: opacity 0.3s; }
+        .gallery-item:hover .gallery-caption { opacity: 1; }
+        .gallery-empty { text-align: center; color: var(--slate-light); padding: 2rem 1rem; }
+
+        /* ===== LIGHTBOX ===== */
+        .gallery-lightbox { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.92); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 2rem; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .gallery-lightbox.show { display: flex; }
+        .gallery-lightbox-img { max-width: 95vw; max-height: 88vh; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .gallery-lightbox-close { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .gallery-lightbox-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .gallery-lightbox-caption { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); color: white; background: rgba(15,23,42,0.6); padding: 0.6rem 1.2rem; border-radius: 50rem; font-size: 0.9rem; max-width: 90vw; text-align: center; }
+
+        @media (max-width: 768px) {
+            .article-gallery { padding: 0 1rem; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .gallery-item { border-radius: 12px; }
+            .gallery-title { font-size: 1.2rem; }
+        }
+
         /* ===== SHARE SECTION ===== */
         .share-section { max-width: 760px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
         .share-text { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--dark); }
@@ -168,6 +196,30 @@
 
             <div class="row justify-content-center">
                 <div class="col-lg-10">
+                    {{-- Galeri Foto Artikel (semua foto tambahan) --}}
+                    @if($artikel->galeri && $artikel->galeri->count() > 0)
+                    <section class="article-gallery" data-aos="fade-up" data-aos-delay="150">
+                        <h3 class="gallery-title">
+                            Galeri Foto
+                            <span class="gallery-title-badge">{{ $artikel->galeri->count() }} foto</span>
+                        </h3>
+                        <div class="gallery-grid">
+                            @foreach($artikel->galeri as $foto)
+                            <div class="gallery-item"
+                                 onclick="openLightbox('{{ asset('storage/' . $foto->gambar) }}', {{ json_encode($foto->keterangan ?? '') }}, {{ $loop->index }})">
+                                <img src="{{ asset('storage/' . $foto->gambar) }}"
+                                     onerror="this.src='https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=2070&auto=format&fit=crop'"
+                                     alt="Galeri {{ $loop->iteration }} dari {{ $artikel->judul }}"
+                                     loading="lazy">
+                                @if(!empty($foto->keterangan))
+                                    <div class="gallery-caption">{{ $foto->keterangan }}</div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </section>
+                    @endif
+
                     <div class="article-body" data-aos="fade-up" data-aos-delay="200">
                         <div class="article-content">
                             {!! $artikel->konten !!}
@@ -233,6 +285,46 @@
             } else {
                 nav.classList.remove('scrolled');
             }
+        });
+    </script>
+
+    {{-- Lightbox untuk galeri artikel --}}
+    <div id="galleryLightbox" class="gallery-lightbox" onclick="closeLightbox(event)">
+        <button type="button" class="gallery-lightbox-close" onclick="closeLightbox(event, true)" aria-label="Tutup">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <img id="lightboxImg" class="gallery-lightbox-img" src="" alt="">
+        <div id="lightboxCaption" class="gallery-lightbox-caption" style="display:none;"></div>
+    </div>
+
+    <script>
+        function openLightbox(src, caption, idx) {
+            const lb = document.getElementById('galleryLightbox');
+            document.getElementById('lightboxImg').src = src;
+            const capEl = document.getElementById('lightboxCaption');
+            try {
+                if (typeof caption === 'string' && caption.length > 0 && caption !== '""' && caption !== 'null') {
+                    capEl.textContent = caption;
+                    capEl.style.display = 'block';
+                } else {
+                    capEl.style.display = 'none';
+                }
+            } catch (e) {
+                capEl.style.display = 'none';
+            }
+            lb.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event, force) {
+            if (force || (event && event.target === event.currentTarget)) {
+                document.getElementById('galleryLightbox').classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox(null, true);
         });
     </script>
 </body>

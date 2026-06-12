@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tabungan;
 use App\Models\Nasabah;
+use App\Models\Penarikan;
 use App\Models\JenisSampah;
 use App\Services\AuditLogService;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class TabunganController extends Controller
@@ -88,12 +88,8 @@ class TabunganController extends Controller
             newData: $tabungan->toArray()
         );
 
-        // Notif ke admin + nasabah
-        $nominal = 'Rp' . number_format($nilaiRupiah, 0, ',', '.');
-        $tanggal = $tabungan->tanggal_setor->format('d M Y');
-
-        NotificationService::tabunganMasuk($nasabah->nama_lengkap, $nominal, $jenisSampah->nama);
-        NotificationService::tabunganMasukNasabah($nasabah->user_id, $nominal, $tanggal);
+        // Notifikasi (admin + nasabah + mobile) otomatis dikirim oleh TabunganObserver
+        // pada event 'created' — lihat app/Observers/TabunganObserver.php
 
         return response()->json([
             'message'      => 'Tabungan berhasil diinput',
@@ -130,9 +126,16 @@ class TabunganController extends Controller
                     ->groupBy('jenis_sampah_id')
                     ->get();
 
+        // Hitung saldo manual
+        $totalTabungan = Tabungan::where('nasabah_id', $nasabahId)->sum('nilai_rupiah');
+        $totalPenarikan = Penarikan::where('nasabah_id', $nasabahId)
+                            ->where('status', 'selesai')
+                            ->sum('nominal');
+        $saldoAktif = $totalTabungan - $totalPenarikan;
+
         return response()->json([
             'nasabah'    => $nasabah->nama_lengkap,
-            'saldo'      => $nasabah->saldo,
+            'saldo'      => $saldoAktif,
             'statistik'  => [
                 'hari_ini'  => $hariIni . ' kg',
                 'bulan_ini' => $bulanIni . ' kg',
@@ -145,17 +148,34 @@ class TabunganController extends Controller
     // DELETE tabungan
     public function destroy(Request $request, $id)
     {
-        $tabungan = Tabungan::with(['nasabah', 'jenisSampah'])->findOrFail($id);
+        try {
+            $tabungan = Tabungan::with(['nasabah', 'jenisSampah'])->findOrFail($id);
 
-        AuditLogService::log(
-            action: 'TABUNGAN_HAPUS',
-            module: 'Tabungan',
-            description: "Admin menghapus tabungan id {$id}",
-            oldData: $tabungan->toArray()
-        );
+            AuditLogService::log(
+                action: 'TABUNGAN_HAPUS',
+                module: 'Tabungan',
+                description: "Admin menghapus tabungan id {$id}",
+                oldData: $tabungan->toArray()
+            );
 
-        $tabungan->delete();
+            $tabungan->delete();
 
-        return response()->json(['message' => 'Data tabungan berhasil dihapus']);
+            return response()->json(['message' => 'Data tabungan berhasil dihapus']);
+        } catch (\App\Exceptions\SaldoMinusException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tabungan tidak ditemukan.',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

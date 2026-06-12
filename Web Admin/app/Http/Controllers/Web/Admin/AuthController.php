@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // Tampilkan halaman login
     public function showLogin()
     {
         if (Auth::check() && Auth::user()->isAdmin()) {
@@ -20,16 +19,16 @@ class AuthController extends Controller
         return view('admin.auth.login');
     }
 
-    // Proses login
     public function login(Request $request)
     {
+        // Validasi field kosong / format salah
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
         ], [
-            'email.required'    => 'Email wajib diisi',
-            'email.email'       => 'Format email tidak valid',
-            'password.required' => 'Password wajib diisi',
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
         $credentials = $request->only('email', 'password');
@@ -37,54 +36,62 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            // Cek apakah admin
-            if (!$user->isAdmin()) {
+            // Cek role admin
+            if (! $user->isAdmin()) {
                 Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Akun ini bukan akun admin.'
-                ]);
+
+                AuditLogService::log(
+                    action:      'LOGIN_BLOCKED',
+                    module:      'Auth',
+                    description: "Login ditolak — {$request->email} bukan akun admin.",
+                    status:      'failed'
+                );
+
+                // PERBAIKAN: tambah withInput agar email tidak hilang
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'Akun ini tidak memiliki akses admin.']);
             }
 
             $request->session()->regenerate();
 
-            // Catat audit log
             AuditLogService::log(
-                action: 'LOGIN',
-                module: 'Auth',
-                description: "Admin {$user->name} berhasil login",
-                status: 'success'
+                action:      'LOGIN',
+                module:      'Auth',
+                description: "Admin {$user->name} berhasil login.",
+                status:      'success'
             );
 
             return redirect()->route('admin.dashboard')
-                        ->with('success', 'Selamat datang, ' . $user->name . '!');
+                ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
 
-        // Catat login gagal
+        // Kredensial salah (email tidak ada ATAU password salah)
+        // Sengaja pakai pesan yang sama untuk keduanya
+        // agar tidak memberi petunjuk mana yang salah (security best practice)
         AuditLogService::log(
-            action: 'LOGIN_FAILED',
-            module: 'Auth',
+            action:      'LOGIN_FAILED',
+            module:      'Auth',
             description: "Login gagal untuk email: {$request->email}",
-            status: 'failed'
+            status:      'failed'
         );
 
-        // Notif ke admin
         NotificationService::loginGagal($request->email);
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah.'
-        ])->withInput($request->only('email'));
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => 'Email atau password yang Anda masukkan salah.']);
     }
 
-    // Logout
     public function logout(Request $request)
     {
         $user = Auth::user();
 
         AuditLogService::log(
-            action: 'LOGOUT',
-            module: 'Auth',
-            description: "Admin {$user->name} logout",
-            status: 'success'
+            action:      'LOGOUT',
+            module:      'Auth',
+            description: "Admin {$user->name} logout.",
+            status:      'success'
         );
 
         Auth::logout();
@@ -92,6 +99,6 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('admin.login')
-                        ->with('success', 'Anda berhasil logout.');
+            ->with('success', 'Anda berhasil logout.');
     }
 }

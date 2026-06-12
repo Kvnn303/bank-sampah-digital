@@ -8,10 +8,12 @@ use App\Models\RiwayatHargaSampah;
 use App\Models\Tabungan;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
+use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
 
 class JenisSampahController extends Controller
 {
+    use NotifiableTrait;
     // Tampilkan semua jenis sampah DENGAN PAGINATION
     public function index(Request $request)
     {
@@ -196,43 +198,59 @@ class JenisSampahController extends Controller
     {
         $request->validate([
             'harga_per_kg' => 'required|numeric|min:0',
-            'alasan'       => 'required|string',
+            'alasan'       => 'required|string|max:500',
+        ], [
+            'harga_per_kg.required' => 'Harga per kg wajib diisi',
+            'harga_per_kg.numeric'  => 'Harga harus berupa angka',
+            'harga_per_kg.min'      => 'Harga tidak boleh negatif',
+            'alasan.required'       => 'Alasan perubahan wajib diisi untuk dokumentasi',
+            'alasan.max'            => 'Alasan terlalu panjang, maksimal 500 karakter',
         ]);
 
-        $sampah    = JenisSampah::findOrFail($id);
-        $hargaLama = $sampah->harga_per_kg;
+        $sampah = JenisSampah::findOrFail($id);
+        $hargaLama = (float) $sampah->harga_per_kg;
+        $hargaBaru = (float) $request->input('harga_per_kg');
 
         // Cek apakah harga benar-benar berubah
-        if ($hargaLama == $request->harga_per_kg) {
-            return redirect()->back()
-                            ->with('error', 'Harga baru sama dengan harga lama, tidak ada perubahan!');
+        if (abs($hargaLama - $hargaBaru) < 0.01) {
+            return redirect()->route('admin.jenis-sampah.index')
+                            ->with('error', 'Harga baru sama dengan harga lama. Silakan masukkan harga yang berbeda!');
         }
 
+        // Update harga aktif
+        $sampah->update(['harga_per_kg' => $hargaBaru]);
+
+        // Buat riwayat harga
         RiwayatHargaSampah::create([
             'jenis_sampah_id' => $sampah->id,
             'harga_lama'      => $hargaLama,
-            'harga_baru'      => $request->harga_per_kg,
-            'alasan'          => $request->alasan,
+            'harga_baru'      => $hargaBaru,
+            'alasan'          => $request->input('alasan'),
             'diubah_oleh'     => auth()->id(),
         ]);
 
-        $sampah->update(['harga_per_kg' => $request->harga_per_kg]);
-
+        // Audit log
         AuditLogService::log(
             action: 'HARGA_UPDATE',
             module: 'JenisSampah',
-            description: "Harga {$sampah->nama} diubah dari Rp{$hargaLama} ke Rp{$request->harga_per_kg}. Alasan: {$request->alasan}",
+            description: "Harga {$sampah->nama} diubah dari Rp{$hargaLama} ke Rp{$hargaBaru}. Alasan: {$request->input('alasan')}",
             oldData: ['harga_per_kg' => $hargaLama],
-            newData: ['harga_per_kg' => $request->harga_per_kg]
+            newData: ['harga_per_kg' => $hargaBaru]
         );
 
-        // ✅ Notif ke admin
+        // Notif ke admin
         $old = 'Rp' . number_format($hargaLama, 0, ',', '.');
-        $new = 'Rp' . number_format($request->harga_per_kg, 0, ',', '.');
+        $new = 'Rp' . number_format($hargaBaru, 0, ',', '.');
         NotificationService::sampahDiubah($sampah->nama, $old, $new);
 
-        return redirect()->back()
-                        ->with('success', "Harga berhasil diperbarui dari Rp" . number_format($hargaLama) . " ke Rp" . number_format($request->harga_per_kg));
+        // Notif massal ke seluruh nasabah
+        NotificationService::hargaSampahBerubahNasabah($sampah->nama, $new);
+
+        // 🔔 TRIGGER MOBILE BANKING: Notifikasi harga sampah berubah
+        $this->notifyHargaBerubah($sampah->nama, $new);
+
+        return redirect()->route('admin.jenis-sampah.index')
+                        ->with('success', "Harga {$sampah->nama} berhasil diperbarui dari {$old} menjadi {$new}");
     }
 
     // Toggle status aktif/nonaktif

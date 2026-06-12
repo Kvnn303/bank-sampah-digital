@@ -215,6 +215,25 @@
                     </div>
                     <div class="card-body p-4 p-md-5">
 
+                        <!-- Alert Pesan -->
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    <div>{{ session('error') }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @elseif(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div>{{ session('success') }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <!-- Harga Saat Ini -->
                         <div class="p-4 bg-emerald-lt border border-emerald rounded-4 mb-4 d-flex justify-content-between align-items-center">
                             <div>
@@ -412,6 +431,46 @@ if(checkbox && statusLabelText) {
             statusLabelText.innerHTML = '<span class="text-emerald fw-semibold">Diterima di Bank Sampah</span>';
         } else {
             statusLabelText.innerHTML = '<span class="text-rose fw-semibold">Saat ini tidak diterima</span>';
+        }
+    });
+}
+
+// Visual feedback saat submit form informasi dasar
+const formInfo = document.querySelector('form[action*="update"][method="POST"]');
+if (formInfo) {
+    formInfo.addEventListener('submit', function() {
+        const btn = formInfo.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-primary');
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> Menyimpan...';
+            setTimeout(() => {
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg> Selesai!';
+            }, 1000);
+        }
+    });
+}
+
+// Visual feedback saat submit form ubah harga
+const formHarga = document.querySelector('form[action*="harga"]');
+if (formHarga) {
+    formHarga.addEventListener('submit', function() {
+        const btn = formHarga.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-dark');
+            btn.textContent = 'Menyimpan...';
+            setTimeout(() => {
+                btn.textContent = 'Selesai!';
+                setTimeout(() => {
+                    btn.textContent = 'Update Harga Sekarang';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-dark');
+                    btn.disabled = false;
+                }, 1500);
+            }, 800);
         }
     });
 }

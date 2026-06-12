@@ -7,12 +7,14 @@ use App\Models\Artikel;
 use App\Models\ArtikelGaleri;
 use App\Models\AuditLog;
 use App\Services\NotificationService;
+use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ArtikelController extends Controller
 {
+    use NotifiableTrait;
 
     public function index(Request $request)
     {
@@ -93,6 +95,11 @@ class ArtikelController extends Controller
 
         // ✅ Notif ke admin
         NotificationService::artikelDibuat($artikel->judul);
+
+        // 🔔 TRIGGER MOBILE BANKING: Kirim notifikasi massal ke Nasabah jika artikel dipublikasikan
+        if ($artikel->is_published) {
+            $this->notifyArtikelBaru($artikel->judul, $artikel->kategori);
+        }
 
         return redirect()->route('admin.artikels.index')->with('success', 'Artikel berhasil ditambahkan.');
     }
@@ -195,6 +202,13 @@ class ArtikelController extends Controller
 
         // Notif ke admin
         NotificationService::artikelDiedit($artikel->judul);
+
+        // 🔔 TRIGGER MOBILE BANKING: Kirim notifikasi massal ke Nasabah jika artikel baru dipublikasikan
+        $wasPublished = $oldData['is_published'] == 1;
+        $nowPublished = $artikel->is_published == 1;
+        if (!$wasPublished && $nowPublished) {
+            $this->notifyArtikelBaru($artikel->judul, $artikel->kategori);
+        }
 
         return redirect()->route('admin.artikels.index')->with('success', 'Artikel berhasil diperbarui.');
     }

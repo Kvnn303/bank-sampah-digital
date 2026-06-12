@@ -7,6 +7,7 @@ use App\Models\Nasabah;
 use App\Models\Tabungan;
 use App\Models\Penarikan;
 use App\Models\JenisSampah;
+use App\Models\StokSampah;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -82,6 +83,29 @@ class DashboardController extends Controller
                             ->take(5)
                             ->get();
 
+        // Statistik Stok Sampah
+        $stokStats = [
+            'total_masuk_kg' => StokSampah::sum('stok_masuk_kg'),
+            'total_tersisa_kg' => StokSampah::sum('stok_tersisa_kg'),
+            'total_terjual_kg' => StokSampah::sum('stok_terjual_kg'),
+            'total_pendapatan' => StokSampah::sum('total_pendapatan'),
+            'tersedia_count' => StokSampah::where('status', 'tersedia')->count(),
+            'sebagian_count' => StokSampah::where('status', 'sebagian')->count(),
+            'terjual_count' => StokSampah::where('status', 'terjual')->count(),
+            'published_count' => StokSampah::where('is_published', true)->count(),
+            'pres_count' => StokSampah::where('is_pres', true)->count(),
+            'total_transaksi' => StokSampah::count(),
+        ];
+
+        // Stok terbaru (published & press & tersedia)
+        $stokTersediaDashboard = StokSampah::with('jenisSampah')
+                                    ->published()
+                                    ->diPress()
+                                    ->where('status', '!=', 'terjual')
+                                    ->orderByDesc('tanggal_masuk')
+                                    ->take(5)
+                                    ->get();
+
         return view('admin.dashboard', compact(
             'totalNasabah',
             'nasabahPending',
@@ -102,6 +126,8 @@ class DashboardController extends Controller
             'jenisSampahAktif',
             'tabunganTerbaru',
             'penarikanTerbaru',
+            'stokStats',
+            'stokTersediaDashboard',
         ));
     }
 }

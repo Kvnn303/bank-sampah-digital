@@ -184,11 +184,43 @@
                                 @error('no_telepon') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
                             </div>
 
+                            <!-- No KTP / NIK -->
+                            <div class="col-md-6">
+                                <label class="form-label">No. KTP (NIK)</label>
+                                <div class="input-icon">
+                                    <span class="input-icon-addon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M15 11h2"/></svg>
+                                    </span>
+                                    <input type="text" name="no_ktp" class="form-control @error('no_ktp') is-invalid @enderror" value="{{ old('no_ktp', $nasabah->no_ktp) }}" maxlength="16" placeholder="16 digit NIK">
+                                </div>
+                                @error('no_ktp') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
+                            </div>
+
                             <!-- Alamat -->
-                            <div class="col-12">
+                            <div class="col-md-7">
                                 <label class="form-label">Alamat Lengkap</label>
                                 <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3" style="resize: none;">{{ old('alamat', $nasabah->alamat) }}</textarea>
                                 @error('alamat') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
+                            </div>
+
+                            <!-- Foto Profil -->
+                            <div class="col-md-5">
+                                <label class="form-label">Foto Profil</label>
+                                <div class="text-center">
+                                    @if($nasabah->foto)
+                                        <img src="{{ asset('storage/'.$nasabah->foto) }}" alt="Foto Profil"
+                                             class="rounded-circle border shadow-sm object-fit-cover mb-3"
+                                             style="width: 100px; height: 100px;">
+                                    @else
+                                        <div class="rounded-circle border shadow-sm d-flex align-items-center justify-content-center mx-auto mb-3 text-white fw-bold"
+                                             style="width: 100px; height: 100px; background: linear-gradient(135deg, #10b981, #059669); font-size: 36px;">
+                                            {{ strtoupper(substr($nasabah->nama_lengkap, 0, 1)) }}
+                                        </div>
+                                    @endif
+                                    <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/jpeg, image/png, image/jpg" id="input-foto-profil" onchange="previewFotoProfil(this)">
+                                    @error('foto') <div class="invalid-feedback d-block fw-medium">{{ $message }}</div> @enderror
+                                    <small class="text-muted d-block mt-2">JPG/PNG maks 2MB</small>
+                                </div>
                             </div>
                         </div>
                     </div>

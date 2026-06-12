@@ -3,12 +3,12 @@
 @forelse($notifications ?? collect() as $notif)
     <a href="{{ $notif->url ?? '#' }}"
        class="list-group-item list-group-item-action {{ !$notif->is_read ? 'bg-primary-lt' : '' }}"
-       onclick="markRead({{ $notif->id }}, event)">
+       onclick="markRead('{{ $notif->id }}', event)">
         <div class="row align-items-center">
 
             <div class="col-auto">
                 <span class="avatar avatar-sm {{ $notif->getIconBgClass() }}">
-                    {!! $notif->getIconSvg() !!}
+                    <x-icon name="{{ $notif->getIconName() }}" size="16" />
                 </span>
             </div>
 
@@ -37,12 +37,7 @@
     </a>
 @empty
     <div class="list-group-item text-center text-muted py-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-muted" width="36" height="36"
-             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6"/>
-            <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
-        </svg>
+        <x-icon name="bell-off" size="36" class="mb-2 text-muted" />
         <div class="small">Tidak ada notifikasi</div>
     </div>
 @endforelse
