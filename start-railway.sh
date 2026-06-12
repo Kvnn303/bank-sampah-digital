@@ -1,6 +1,8 @@
 #!/bin/bash
 # Railway deployment initialization script
 
+cd "Web Admin"
+
 echo "🚀 [1/4] Running migrations..."
 php artisan migrate:fresh --force
 

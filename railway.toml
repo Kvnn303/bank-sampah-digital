@@ -1,12 +1,9 @@
 # Railway Configuration untuk Bank Sampah Digital
 
 [build]
-cmd = "composer install --no-dev --optimize-autoloader && npm install && npm run build"
+cmd = "cd 'Web Admin' && composer install --no-dev --optimize-autoloader && npm install && npm run build"
 
 [deploy]
-startCommand = "php -S 0.0.0.0:${PORT:-8000} public/index.php"
+startCommand = "cd 'Web Admin' && php -S 0.0.0.0:${PORT:-8000} public/index.php"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
-
-[environments.production]
-builder = "heroku.buildpacks"
