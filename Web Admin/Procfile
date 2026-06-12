@@ -1,2 +1,2 @@
-release: php artisan migrate:fresh --force
+release: php artisan migrate:fresh --force && php artisan storage:link
 web: php -S 0.0.0.0:${PORT:-8000} public/index.php
