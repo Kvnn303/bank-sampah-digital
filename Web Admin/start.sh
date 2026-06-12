@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Exit on any error
-set -e
+# Start script - dijalankan Railway sebagai backup
+# Gunakan Procfile sebagai sumber utama
 
-echo "Running migrations..."
-php artisan migrate:fresh --force --seed
+set -e
 
 echo "Clearing cache..."
 php artisan config:clear

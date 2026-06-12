@@ -1,27 +1,33 @@
 #!/bin/bash
 
-# Migration script untuk Railway deployment
-# Menjalankan php artisan migrate:fresh --force untuk mengatasi crash loop
+# Deploy script untuk Railway
+# Aman untuk production - TIDAK menghapus data yang ada
 
-echo "🚀 Starting Railway deployment process..."
-echo "📦 Installing dependencies..."
-composer install --no-dev --optimize-autoloader
+set -e
 
-echo "🔑 Setting up environment..."
-php artisan key:generate --force 2>/dev/null || true
+echo "=== Bank Sampah Digital - Railway Deploy Script ==="
 
-echo "🗄️  Running migrations with fresh (dropping all tables and re-creating)..."
-php artisan migrate:fresh --force --seed
+# Generate app key jika belum ada
+if [ -z "$APP_KEY" ]; then
+    echo "Generating APP_KEY..."
+    php artisan key:generate --force
+fi
 
-echo "🧹 Clearing all caches..."
+echo "Running migrations (safe - tidak hapus data)..."
+php artisan migrate --force
+
+echo "Creating storage symlink..."
+php artisan storage:link --force 2>/dev/null || true
+
+echo "Clearing old caches..."
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
 
-echo "⚡ Re-caching for production..."
+echo "Re-caching for production..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "✅ Deployment complete!"
+echo "=== Deploy complete! ==="
