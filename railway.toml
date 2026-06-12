@@ -1,13 +1,9 @@
-# Railway Configuration untuk Bank Sampah Digital
-
 [build]
 builder = "nixpacks"
-buildCommand = "cd WebAdmin && composer install --no-dev --optimize-autoloader --no-interaction && npm ci && npm run build"
 
 [deploy]
-startCommand = "cd WebAdmin && bash scripts/deploy.sh && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"
+startCommand = "bash scripts/deploy.sh && php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/up"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-
