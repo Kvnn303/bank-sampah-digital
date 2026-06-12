@@ -1,0 +1,9 @@
+# Railway Configuration untuk Bank Sampah Digital
+
+# Build command
+[build]
+cmd = "composer install --no-dev --optimize-autoloader && npm install && npm run build"
+
+# Start command
+[start]
+cmd = "php artisan migrate:fresh --force --seed && php -S 0.0.0.0:${PORT:-8000} public/index.php"
