@@ -1,17 +1,34 @@
 #!/bin/bash
 # Railway deployment initialization script
 
-cd "Web Admin"
+cd WebAdmin
 
-echo "🚀 [1/4] Running migrations..."
-php artisan migrate:fresh --force
+# Generate app key jika belum ada
+if [ -z "$APP_KEY" ]; then
+    echo "Generating APP_KEY..."
+    php artisan key:generate --force
+fi
 
-echo "🔗 [2/4] Creating storage symlink..."
-php artisan storage:link
+echo "🚀 [1/5] Running migrations (safe)..."
+php artisan migrate --force
 
-echo "🏗️ [3/4] Caching configuration..."
+echo "🔗 [2/5] Creating storage symlink..."
+php artisan storage:link --force 2>/dev/null || true
+
+echo "🏗️ [3/5] Clearing caches..."
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+
+echo "⚡ [4/5] Caching for production..."
 php artisan config:cache
 php artisan route:cache
+php artisan view:cache 2>/dev/null || true
 
-echo "✅ [4/4] Starting server on port ${PORT:-8000}..."
-php -S 0.0.0.0:${PORT:-8000} public/index.php
+echo "🔒 [5/5] Setting permissions..."
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+
+echo "✅ Starting server on port ${PORT:-8000}..."
+php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+

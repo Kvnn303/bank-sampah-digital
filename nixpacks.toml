@@ -1,0 +1,20 @@
+# nixpacks.toml - Konfigurasi build Railway untuk Laravel + Vite
+# File ini harus ada di ROOT repository (sejajar dengan folder WebAdmin)
+
+[phases.setup]
+nixPkgs = ["php84", "php84Packages.composer", "nodejs_20"]
+
+[phases.install]
+cmds = [
+    "cd WebAdmin && composer install --no-dev --optimize-autoloader --no-interaction",
+    "cd WebAdmin && npm ci --no-audit"
+]
+
+[phases.build]
+cmds = [
+    "cd WebAdmin && npm run build"
+]
+
+[start]
+cmd = "cd WebAdmin && bash scripts/deploy.sh && php artisan serve --host=0.0.0.0 --port=$PORT"
+

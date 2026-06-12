@@ -20,14 +20,17 @@ echo "Creating storage symlink..."
 php artisan storage:link --force 2>/dev/null || true
 
 echo "Clearing old caches..."
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
 
 echo "Re-caching for production..."
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
+php artisan view:cache 2>/dev/null || true
+
+echo "Setting storage permissions..."
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
 echo "=== Deploy complete! ==="
