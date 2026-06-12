@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust proxies dari Railway load balancer
+        $middleware->trustProxies(at: '*');
+        
         $middleware->statefulApi();
         $middleware->alias([
             'is.admin'   => \App\Http\Middleware\IsAdmin::class,
