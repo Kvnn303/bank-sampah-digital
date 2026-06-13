@@ -27,4 +27,4 @@ php artisan migrate --force
 echo "Folder berhasil dibuat dan dihubungkan!"
 
 # 6. NYALAKAN SERVER
-exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+exec php artisan serve --host=0.0.0.0 --port=$PORT
