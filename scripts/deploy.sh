@@ -17,9 +17,9 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force --no-interaction
 fi
 
-# Retry database connection up to 10 times (Railway DB can take time to be ready)
+# Retry database connection up to 15 times (Railway DB can take time to be ready)
 echo "Waiting for database connection..."
-MAX_RETRIES=10
+MAX_RETRIES=15
 RETRY_COUNT=0
 DB_READY=false
 
@@ -41,26 +41,13 @@ done
 
 if [ "$DB_READY" = true ]; then
     echo "Database port reachable. Running migrations..."
-    php artisan migrate --force --no-interaction 2>/dev/null
-
-    # Clear and rebuild cache AFTER migration (so config doesn't fail)
-    echo "Clearing and rebuilding cache..."
-    php artisan config:clear 2>/dev/null || true
-    php artisan cache:clear 2>/dev/null || true
-    php artisan route:clear 2>/dev/null || true
-    php artisan view:clear 2>/dev/null || true
-    php artisan config:cache 2>/dev/null || true
-    php artisan route:cache 2>/dev/null || true
-    php artisan view:cache 2>/dev/null || true
+    php artisan migrate --force --no-interaction
 
     echo "Creating storage symlink..."
     php artisan storage:link --force 2>/dev/null || true
-
-    echo "=== Deploy complete! ==="
 else
     echo "WARNING: Database port not reachable after $MAX_RETRIES attempts."
-    echo "Starting server anyway - Laravel will handle DB connection on first request."
-    echo "Migrations will be handled by first HTTP request if needed."
+    echo "Starting server anyway - migrations can be run via Console."
 fi
 
 echo "=== Deploy complete! ==="

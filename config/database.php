@@ -63,6 +63,7 @@ return [
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
                 PDO::ATTR_PERSISTENT => false,
                 PDO::MYSQL_ATTR_COMPRESS => true,
+                PDO::ATTR_EMULATE_PREPARES => true,
             ]) : [],
         ],
 
