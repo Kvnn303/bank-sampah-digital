@@ -1,62 +1,58 @@
-# ===== Builder Stage: Frontend =====
+# ===== Tahap 1: Builder Frontend (Node.js) =====
 FROM node:22-alpine AS frontend-builder
-
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files dan install dependencies NPM
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy source files
+# Copy seluruh file dan build aset untuk production
 COPY . .
-
-# Build frontend assets for production
 RUN npm run build
 
-# ===== Production Stage: Laravel + Nginx =====
-FROM webdevops/php-nginx:8.4-debian
+# ===== Tahap 2: Production (Laravel + Apache) =====
+FROM php:8.4-apache
 
-# Set working directory
-WORKDIR /app
-
-# Set environment variables
-ENV WEB_DOCUMENT_ROOT=/app/public
-
-# Copy composer files
-COPY composer.json composer.lock ./
-
-# Install PHP extensions needed by Laravel
+# 1. Install ekstensi sistem yang dibutuhkan Debian & PHP
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
-    libfreetype-dev \
+    libfreetype6-dev \
     zip \
+    unzip \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd zip pdo_mysql
 
-# Install PHP dependencies
+# 2. Install Composer langsung dari sumber resmi
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# 3. Setup DocumentRoot Apache agar mengarah ke folder /public
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# 4. Aktifkan mod_rewrite (Wajib untuk routing Laravel)
+RUN a2enmod rewrite
+
+# 5. Konfigurasi Port Dinamis untuk Railway
+RUN sed -i "s/Listen 80/Listen \${PORT:-80}/g" /etc/apache2/ports.conf
+RUN sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:\${PORT:-80}>/g" /etc/apache2/sites-available/000-default.conf
+
+# 6. Set folder kerja utama
+WORKDIR /var/www/html
+
+# 7. Copy file composer dan install dependensi PHP
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copy Laravel application code
+# 8. Copy seluruh kodingan Laravel
 COPY . .
 
-# Copy built frontend assets from builder stage
+# 9. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
 COPY --from=frontend-builder /app/public/build ./public/build
 
-# Create storage directories and set permissions
+# 10. Buat folder yang wajib ada dan atur perizinannya untuk server
 RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs \
-    && chmod -R 775 storage bootstrap/cache
-
-# Copy .env.example to .env
-RUN cp .env.example .env || true
-
-# Generate app key if not set
-RUN php artisan key:generate --no-interaction --force 2>/dev/null || true
-
-# Expose port 8080 (webdevops default)
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD php artisan up || exit 1
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
