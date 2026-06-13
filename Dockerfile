@@ -10,8 +10,8 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# ===== Tahap 2: Production (Laravel + Apache) =====
-FROM php:8.4-apache
+# ===== Tahap 2: Production (Laravel CLI - Tanpa Apache) =====
+FROM php:8.4-cli
 
 # 1. Install ekstensi sistem yang dibutuhkan Debian & PHP
 RUN apt-get update && apt-get install -y \
@@ -22,35 +22,21 @@ RUN apt-get update && apt-get install -y \
 # 2. Install Composer langsung dari sumber resmi
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 3. Setup DocumentRoot Apache agar mengarah ke folder /public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# 3. Set folder kerja utama ke /app (bukan /var/www/html lagi)
+WORKDIR /app
 
-# 4. Solusi Ampuh Error MPM Apache (Hapus semua, sisakan prefork)
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
-
-# 5. Aktifkan mod_rewrite (Wajib untuk routing Laravel)
-RUN a2enmod rewrite
-
-# 6. Konfigurasi Port Dinamis untuk Railway (Gunakan tanda kutip tunggal agar aman)
-RUN sed -i 's/Listen 80/Listen ${PORT:-80}/g' /etc/apache2/ports.conf
-RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost \*:${PORT:-80}>/g' /etc/apache2/sites-available/000-default.conf
-
-# 7. Set folder kerja utama
-WORKDIR /var/www/html
-
-# 8. Copy seluruh kodingan Laravel
+# 4. Copy seluruh kodingan Laravel
 COPY . .
 
-# 9. Install dependensi PHP (Jalankan setelah file artisan tercopy)
+# 5. Install dependensi PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 10. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
+# 6. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
 COPY --from=frontend-builder /app/public/build ./public/build
 
-# 11. Buat folder yang wajib ada dan atur perizinannya untuk server
+# 7. Buat folder yang wajib ada dan atur perizinannya
 RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+    && chmod -R 777 storage bootstrap/cache
+
+# 8. JALAN TOL: Gunakan server bawaan Laravel yang anti-rewel!
+CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
