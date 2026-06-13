@@ -1,52 +1,38 @@
 # ===== Tahap 1: Builder Frontend (Node.js) =====
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
-
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
-
+RUN npm ci
 COPY . .
 RUN npm run build
 
-# ===== Tahap 2: Production (PHP CLI) =====
+# ===== Tahap 2: Production (Laravel CLI - Tanpa Apache) =====
 FROM php:8.4-cli
 
+# 1. Install ekstensi sistem yang dibutuhkan Debian & PHP
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip git curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo_mysql pdo_sqlite \
-    && pecl install apcu && docker-php-ext-enable apcu
+    && docker-php-ext-install gd zip pdo_mysql
 
+# 2. Install Composer langsung dari sumber resmi
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copy built assets first (before full copy to leverage cache)
-COPY --from=frontend-builder /app/public/build ./public/build
-
+# 3. Copy seluruh kodingan Laravel
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+# 4. Install dependensi PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Prepare application
-RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+# 5. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
+COPY --from=frontend-builder /app/public/build ./public/build
 
-# Install PostgreSQL client (Railway uses Postgres by default for free tier)
-RUN apt-get update && apt-get install -y default-libmysqlclient-dev && docker-php-ext-install mysqli
+# 6. Buat folder wajib sebagai pondasi awal
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/testing storage/logs bootstrap/cache \
+    && chmod -R 777 storage bootstrap/cache
 
-# Clean up
-RUN rm -rf /var/lib/apt/lists/*
-
-EXPOSE ${PORT:-8000}
-
-COPY deploy.sh /app/deploy.sh
-RUN chmod +x /app/deploy.sh
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD php artisan up || exit 1
-
-ENTRYPOINT ["/app/deploy.sh"]
+# 7. JALAN PINTAS EKSTREM: Startup Script langsung di dalam CMD!
+# Ini akan berjalan SETELAH Volume Railway terpasang, memastikan folder tidak akan pernah hilang.
+CMD sh -c "mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache && chmod -R 777 storage bootstrap/cache && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
