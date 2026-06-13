@@ -1,0 +1,19 @@
+# Exclude dev-only files
+.git
+.gitignore
+node_modules
+vendor
+storage/*.key
+Dockerfile
+Dockerfile.production
+.github
+.vscode
+.idea
+*.log
+.env
+.env.backup
+railway*.md
+STATIC_FILES_DEPLOYMENT.md
+HTTPS_CONFIGURATION.md
+ICON-SYSTEM.md
+pluck('title')
