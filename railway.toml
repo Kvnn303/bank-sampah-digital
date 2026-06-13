@@ -2,9 +2,9 @@
 builder = "nixpacks"
 phases = [
     "apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd && docker-php-ext-install zip",
-    "npm install",
-    "npm run build",
-    "composer install --no-dev --optimize-autoloader --no-interaction"
+    "composer install --no-dev --optimize-autoloader --no-interaction",
+    "npm ci",
+    "npm run build"
 ]
 
 [deploy]
