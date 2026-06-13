@@ -7,3 +7,6 @@ cmds = ["npm run build"]
 [variables]
 APP_ENV = "production"
 APP_DEBUG = "false"
+
+[php]
+version = "8.4"
