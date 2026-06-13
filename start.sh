@@ -1,7 +1,8 @@
 #!/bin/sh
+
 echo "Memulai proses persiapan server..."
 
-# 1. BUAT ULANG SEMUA FOLDER WAJIB SETELAH VOLUME DI-MOUNT
+# 1. Buat folder wajib
 mkdir -p /app/storage/framework/sessions
 mkdir -p /app/storage/framework/views
 mkdir -p /app/storage/framework/cache/data
@@ -10,21 +11,21 @@ mkdir -p /app/storage/logs
 mkdir -p /app/storage/app/public
 mkdir -p /app/bootstrap/cache
 
-# 2. BUKA GEMBOK AKSES
+# 2. Buka izin
 chmod -R 777 /app/storage
 chmod -R 777 /app/bootstrap/cache
 
-# 3. RESET DAN BUAT ULANG LINK FOTO YANG BENAR
+# 3. Reset link foto
 rm -rf /app/public/storage
 php artisan storage:link
 
-# 4. BERSIHKAN CACHE SETELAH FOLDER TERBUAT
+# 4. Bersihkan cache
 php artisan optimize:clear
 
-# 5. JALANKAN MIGRASI DATABASE SECARA OTOMATIS
+# 5. Migrate database
 php artisan migrate --force
 
-echo "Folder berhasil dibuat dan dihubungkan!"
+echo "Persiapan selesai, menyalakan server Native PHP..."
 
-# 6. NYALAKAN SERVER
-exec php -S 0.0.0.0:${PORT:-8080} -t public
+# 6. INI KUNCINYA: Gunakan PHP Native, bukan artisan serve
+exec php -S 0.0.0.0:8080 -t public
