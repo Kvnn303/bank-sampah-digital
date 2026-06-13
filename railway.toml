@@ -7,6 +7,14 @@ phases = [
     "npm run build"
 ]
 
+[nixpacks]
+provider = "ubuntu"
+phpVersion = "8.4"
+
+[nixpacks.physicalPackages]
+php8.4-mysql = ""
+php8.4-sqlite3 = ""
+
 [deploy]
 startCommand = "php -S 0.0.0.0:${PORT:-8000} public/index.php"
 healthcheckPath = "/up"
