@@ -1,3 +1,4 @@
+
 [phases.install]
 cmds = ["composer install --optimize-autoloader --no-dev", "npm ci"]
 
@@ -7,6 +8,4 @@ cmds = ["npm run build"]
 [variables]
 APP_ENV = "production"
 APP_DEBUG = "false"
-
-[php]
-version = "8.4"
+PHP_VERSION = "8.4.6"

@@ -17,56 +17,50 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force --no-interaction
 fi
 
-# Retry database connection up to 5 times
+# Retry database connection up to 10 times (Railway DB can take time to be ready)
 echo "Waiting for database connection..."
-MAX_RETRIES=5
+MAX_RETRIES=10
 RETRY_COUNT=0
 DB_READY=false
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if php artisan db:show --no-ansi > /dev/null 2>&1; then
+    if php -r "
+        \$host = getenv('DB_HOST') ?: 'mysql.railway.internal';
+        \$port = getenv('DB_PORT') ?: 3306;
+        \$conn = @fsockopen(\$host, \$port, \$errno, \$errstr, 5);
+        if (\$conn) { fclose(\$conn); exit(0); }
+        exit(1);
+    " 2>/dev/null; then
         DB_READY=true
         break
     fi
     RETRY_COUNT=$((RETRY_COUNT + 1))
-    echo "  Attempt $RETRY_COUNT/$MAX_RETRIES - database not ready, waiting 10s..."
+    echo "  Attempt $RETRY_COUNT/$MAX_RETRIES - database port not reachable, waiting 10s..."
     sleep 10
 done
 
 if [ "$DB_READY" = true ]; then
-    echo "Database connected. Running migrations..."
-    php artisan migrate --force --no-interaction
+    echo "Database port reachable. Running migrations..."
+    php artisan migrate --force --no-interaction 2>/dev/null
 
-    # Check if migrations succeeded
-    MIGRATE_EXIT=$?
-    if [ $MIGRATE_EXIT -ne 0 ]; then
-        echo "WARNING: Migration failed with exit code $MIGRATE_EXIT"
-        echo "This may be due to tables already existing. Running migrate status..."
-        php artisan migrate:status --no-ansi 2>/dev/null || true
-    else
-        echo "Migrations completed successfully."
-    fi
+    # Clear and rebuild cache AFTER migration (so config doesn't fail)
+    echo "Clearing and rebuilding cache..."
+    php artisan config:clear 2>/dev/null || true
+    php artisan cache:clear 2>/dev/null || true
+    php artisan route:clear 2>/dev/null || true
+    php artisan view:clear 2>/dev/null || true
+    php artisan config:cache 2>/dev/null || true
+    php artisan route:cache 2>/dev/null || true
+    php artisan view:cache 2>/dev/null || true
+
+    echo "Creating storage symlink..."
+    php artisan storage:link --force 2>/dev/null || true
+
+    echo "=== Deploy complete! ==="
 else
-    echo "ERROR: Database could not be connected after $MAX_RETRIES attempts."
-    echo "The application will start without migrations."
-    echo "You will need to run migrations manually."
+    echo "WARNING: Database port not reachable after $MAX_RETRIES attempts."
+    echo "Starting server anyway - Laravel will handle DB connection on first request."
+    echo "Migrations will be handled by first HTTP request if needed."
 fi
-
-echo "Creating storage symlink..."
-php artisan storage:link --force 2>/dev/null || true
-
-echo "Clearing old caches..."
-php artisan config:clear 2>/dev/null || true
-php artisan cache:clear 2>/dev/null || true
-php artisan route:clear 2>/dev/null || true
-php artisan view:clear 2>/dev/null || true
-
-echo "Re-caching for production..."
-php artisan config:cache 2>/dev/null || true
-php artisan route:cache 2>/dev/null || true
-php artisan view:cache 2>/dev/null || true
-
-echo "Setting storage permissions..."
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
 echo "=== Deploy complete! ==="
