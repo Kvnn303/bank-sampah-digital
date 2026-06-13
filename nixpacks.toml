@@ -1,0 +1,11 @@
+[phases]
+install = "composer install --optimize-autoloader --no-dev && npm ci"
+build = "npm run build"
+start = "php artisan serve --host=0.0.0.0 --port=$PORT"
+
+[staticDir]
+public = "."
+
+[variables]
+APP_ENV = "production"
+APP_DEBUG = "false"
