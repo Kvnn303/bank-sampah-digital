@@ -34,12 +34,12 @@ RUN sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:\${PORT:-80}>/g" /etc/apache2/
 # 6. Set folder kerja utama
 WORKDIR /var/www/html
 
-# 7. Copy file composer dan install dependensi PHP
+# 7. Copy seluruh kodingan Laravel
+COPY . .
+
+# 8. Copy file composer dan install dependensi PHP
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# 8. Copy seluruh kodingan Laravel
-COPY . .
 
 # 9. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
 COPY --from=frontend-builder /app/public/build ./public/build
