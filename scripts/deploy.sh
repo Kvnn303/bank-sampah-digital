@@ -1,27 +1,27 @@
 #!/bin/bash
 
-# Production deployment script for Railway
-# Runs during release phase before the app starts
+# Deploy script untuk Railway - release phase
+# Aman untuk production - TIDAK menghapus data
 
-set -e
+echo "=== Bank Sampah Digital - Railway Deploy Script ==="
 
-echo "=== Bank Sampah Digital - Deployment ==="
-
-# Generate APP_KEY if not set
+# Generate app key jika belum ada
 if [ -z "$APP_KEY" ]; then
     echo "Generating APP_KEY..."
     php artisan key:generate --force
-    echo "APP_KEY generated successfully"
 fi
 
-echo "Running database migrations (safe - not dropping data)..."
-php artisan migrate --force --env=production 2>&1 || echo "WARN: Migration failed, continuing anyway..."
+echo "Running migrations (safe - tidak hapus data)..."
+php artisan migrate --force || true
 
 echo "Creating storage symlink..."
-php artisan storage:link --force 2>/dev/null || echo "WARN: Storage symlink failed"
+php artisan storage:link --force 2>/dev/null || true
 
-echo "Optimizing for production..."
-php artisan config:cache 2>&1 || echo "WARN: Config cache failed"
-php artisan route:cache 2>&1 || echo "WARN: Route cache failed"
+echo "Caching for production..."
+php artisan config:cache || true
+php artisan route:cache || true
 
-echo "=== Deployment complete! ==="
+echo "Setting storage permissions..."
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+
+echo "=== Deploy complete! ==="
