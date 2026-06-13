@@ -6,7 +6,11 @@
 # Jangan keluar otomatis pada error - kita mau log dan lanjut
 set +e
 
+LOG_FILE="/tmp/deploy.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 echo "=== Bank Sampah Digital - Railway Deploy Script ==="
+echo "=== $(date) ==="
 
 # Generate app key jika belum ada
 if [ -z "$APP_KEY" ]; then
