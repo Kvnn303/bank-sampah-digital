@@ -14,15 +14,7 @@ RUN npm run build
 FROM php:8.4-apache
 
 # 1. Install ekstensi sistem yang dibutuhkan Debian & PHP
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    unzip \
-    git \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo_mysql
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip git && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd zip pdo_mysql
 
 # 2. Install Composer langsung dari sumber resmi
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
