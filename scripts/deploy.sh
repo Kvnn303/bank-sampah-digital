@@ -3,7 +3,6 @@
 # Deploy script untuk Railway
 # Aman untuk production - TIDAK menghapus data yang ada
 
-# Jangan keluar otomatis pada error - kita mau log dan lanjut
 set +e
 
 LOG_FILE="/tmp/deploy.log"
@@ -18,18 +17,39 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force --no-interaction
 fi
 
-# Cek apakah database tersedia
-echo "Checking database connection..."
-DB_CHECK=$(php artisan db:show --no-ansi 2>&1)
-DB_EXIT=$?
+# Retry database connection up to 5 times
+echo "Waiting for database connection..."
+MAX_RETRIES=5
+RETRY_COUNT=0
+DB_READY=false
 
-if [ $DB_EXIT -eq 0 ]; then
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if php artisan db:show --no-ansi > /dev/null 2>&1; then
+        DB_READY=true
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    echo "  Attempt $RETRY_COUNT/$MAX_RETRIES - database not ready, waiting 10s..."
+    sleep 10
+done
+
+if [ "$DB_READY" = true ]; then
     echo "Database connected. Running migrations..."
     php artisan migrate --force --no-interaction
+
+    # Check if migrations succeeded
+    MIGRATE_EXIT=$?
+    if [ $MIGRATE_EXIT -ne 0 ]; then
+        echo "WARNING: Migration failed with exit code $MIGRATE_EXIT"
+        echo "This may be due to tables already existing. Running migrate status..."
+        php artisan migrate:status --no-ansi 2>/dev/null || true
+    else
+        echo "Migrations completed successfully."
+    fi
 else
-    echo "WARNING: Database not available yet, skipping migrations."
-    echo "DB output: $DB_CHECK"
-    echo "Migrations will need to run manually after MySQL service is provisioned."
+    echo "ERROR: Database could not be connected after $MAX_RETRIES attempts."
+    echo "The application will start without migrations."
+    echo "You will need to run migrations manually."
 fi
 
 echo "Creating storage symlink..."

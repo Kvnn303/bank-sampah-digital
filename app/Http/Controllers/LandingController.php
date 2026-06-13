@@ -7,25 +7,53 @@ use App\Models\Artikel;
 use App\Models\Nasabah;
 use App\Models\Tabungan;
 use App\Models\StokSampah;
-use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
     public function index()
     {
-        $totalNasabah = Nasabah::whereIn('status_akun', ['active', 'verified'])->count();
-        $totalSampah = Tabungan::sum('berat_kg');
-        $jenisSampah = JenisSampah::where('is_active', true)->orderBy('kategori', 'asc')->get();
-        $artikels = Artikel::where('is_published', true)->latest()->take(3)->get();
+        // Graceful defaults when database tables don't exist yet
+        $totalNasabah = 0;
+        $totalSampah = 0;
+        $jenisSampah = collect();
+        $artikels = collect();
+        $stokTersedia = collect();
 
-        // Stok yang dipublikasikan (siap dijual ke pengepul)
-        $stokTersedia = StokSampah::with('jenisSampah')
-            ->published()
-            ->diPress()
-            ->where('status', '!=', 'terjual')
-            ->orderByDesc('tanggal_masuk')
-            ->take(6)
-            ->get();
+        try {
+            $totalNasabah = Nasabah::whereIn('status_akun', ['active', 'verified'])->count();
+        } catch (\Throwable $e) {
+            // table may not exist yet
+        }
+
+        try {
+            $totalSampah = Tabungan::sum('berat_kg');
+        } catch (\Throwable $e) {
+            // table may not exist yet
+        }
+
+        try {
+            $jenisSampah = JenisSampah::where('is_active', true)->orderBy('kategori', 'asc')->get();
+        } catch (\Throwable $e) {
+            // table may not exist yet
+        }
+
+        try {
+            $artikels = Artikel::where('is_published', true)->latest()->take(3)->get();
+        } catch (\Throwable $e) {
+            // table may not exist yet
+        }
+
+        try {
+            $stokTersedia = StokSampah::with('jenisSampah')
+                ->published()
+                ->diPress()
+                ->where('status', '!=', 'terjual')
+                ->orderByDesc('tanggal_masuk')
+                ->take(6)
+                ->get();
+        } catch (\Throwable $e) {
+            // table may not exist yet
+        }
 
         return view('welcome', compact(
             'totalNasabah',
