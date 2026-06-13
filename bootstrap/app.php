@@ -23,8 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Log unhandled exceptions to storage for Railway debugging
+        // TEMPORARY: Show error details in browser for Railway debugging
+        // REMOVE THIS AFTER DEBUGGING
         $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->is('/')) {
+                return response("<pre style='font-family:monospace;padding:20px;color:red'><b>ERROR:</b> " . get_class($e) . "<br><br><b>MESSAGE:</b> " . htmlspecialchars($e->getMessage()) . "<br><br><b>FILE:</b> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "<br><br><b>TRACE:</b>\n" . $e->getTraceAsString() . "</pre>", 500);
+            }
             report($e);
         });
 
