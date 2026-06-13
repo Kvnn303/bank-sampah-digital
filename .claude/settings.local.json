@@ -4,7 +4,8 @@
       "Bash(sed -n '95,105p' \"C:/laragon/www/BankSampahDigital/Web Admin/app/Http/Controllers/Web/Admin/ArtikelController.php\")",
       "Bash(sed -n '200,215p' \"C:/laragon/www/BankSampahDigital/Web Admin/app/Http/Controllers/Web/Admin/ArtikelController.php\")",
       "Bash(php artisan *)",
-      "Bash(xargs grep -l \"NotificationService\\\\|NotifiableTrait\")"
+      "Bash(xargs grep -l \"NotificationService\\\\|NotifiableTrait\")",
+      "Bash(php -v)"
     ]
   }
 }
