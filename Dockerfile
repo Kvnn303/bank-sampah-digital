@@ -24,24 +24,28 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# 4. Aktifkan mod_rewrite (Wajib untuk routing Laravel)
+# 4. Disable semua MPM kecuali prefork (hanya boleh satu MPM aktif)
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
+
+# 5. Aktifkan mod_rewrite (Wajib untuk routing Laravel)
 RUN a2enmod rewrite
 
-# 5. Konfigurasi Port Dinamis untuk Railway
+# 6. Konfigurasi Port Dinamis untuk Railway
 RUN sed -i "s/Listen 80/Listen \${PORT:-80}/g" /etc/apache2/ports.conf
 RUN sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:\${PORT:-80}>/g" /etc/apache2/sites-available/000-default.conf
 
-# 6. Set folder kerja utama
+# 7. Set folder kerja utama
 WORKDIR /var/www/html
 
-# 7. Copy seluruh kodingan Laravel
+# 8. Copy seluruh kodingan Laravel
 COPY . .
 
-# 8. Copy file composer dan install dependensi PHP
+# 9. Copy file composer dan install dependensi PHP
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 9. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
+# 10. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
 COPY --from=frontend-builder /app/public/build ./public/build
 
 # 10. Buat folder yang wajib ada dan atur perizinannya untuk server
