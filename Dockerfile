@@ -14,23 +14,22 @@ COPY . .
 RUN npm run build
 
 # ===== Production Stage: Laravel + Nginx =====
-FROM webdevops/php-nginx:8.4-alpine
+FROM webdevops/php-nginx:8.4-debian
 
 # Set working directory
 WORKDIR /app
 
 # Set environment variables
 ENV WEB_DOCUMENT_ROOT=/app/public
-ENV WEB_DOCUMENT_ROOT=/app/public
 
 # Copy composer files
 COPY composer.json composer.lock ./
 
 # Install PHP extensions needed by Laravel
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
-    freetype-dev \
+    libfreetype-dev \
     zip \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
