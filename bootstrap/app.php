@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Log unhandled exceptions to storage for Railway debugging
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            report($e);
+        });
+
         // Kalau unauthenticated di API, return JSON bukan redirect
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
