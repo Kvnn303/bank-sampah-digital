@@ -28,4 +28,4 @@ php artisan migrate --force
 echo "Persiapan selesai, menyalakan server Native PHP..."
 
 # 6. INI KUNCINYA: Gunakan PHP Native, bukan artisan serve
-exec php -S 0.0.0.0:8080 -t public
+exec php -S 0.0.0.0:${PORT:-8080} -t public
