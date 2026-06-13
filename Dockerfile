@@ -2,41 +2,51 @@
 FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 
-# Copy package files dan install dependencies NPM
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
-# Copy seluruh file dan build aset untuk production
 COPY . .
 RUN npm run build
 
-# ===== Tahap 2: Production (Laravel CLI - Tanpa Apache) =====
+# ===== Tahap 2: Production (PHP CLI) =====
 FROM php:8.4-cli
 
-# 1. Install ekstensi sistem yang dibutuhkan Debian & PHP
 RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip git \
+    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip git curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd zip pdo_mysql
+    && docker-php-ext-install gd zip pdo_mysql pdo_sqlite \
+    && pecl install apcu && docker-php-ext-enable apcu
 
-# 2. Install Composer langsung dari sumber resmi
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 3. Set folder kerja utama ke /app (bukan /var/www/html lagi)
 WORKDIR /app
 
-# 4. Copy seluruh kodingan Laravel
-COPY . .
-
-# 5. Install dependensi PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# 6. Ambil hasil build frontend (CSS/JS Vite) dari Tahap 1
+# Copy built assets first (before full copy to leverage cache)
 COPY --from=frontend-builder /app/public/build ./public/build
 
-# 7. Buat folder yang wajib ada dan atur perizinannya
-RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs \
-    && chmod -R 777 storage bootstrap/cache
+COPY . .
 
-# 8. JALAN TOL: Gunakan server bawaan Laravel yang anti-rewel!
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Prepare application
+RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+# Install PostgreSQL client (Railway uses Postgres by default for free tier)
+RUN apt-get update && apt-get install -y default-libmysqlclient-dev && docker-php-ext-install mysqli
+
+# Clean up
+RUN rm -rf /var/lib/apt/lists/*
+
+EXPOSE ${PORT:-8000}
+
+COPY deploy.sh /app/deploy.sh
+RUN chmod +x /app/deploy.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD php artisan up || exit 1
+
+ENTRYPOINT ["/app/deploy.sh"]

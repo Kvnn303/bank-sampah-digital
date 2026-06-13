@@ -1,0 +1,11 @@
+.git
+node_modules
+vendor
+storage/*.key
+.DS_Store
+.env
+.env.backup
+*.log
+.vscode
+.idea
+Thumbs.db
