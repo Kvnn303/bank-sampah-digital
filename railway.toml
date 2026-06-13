@@ -1,10 +1,10 @@
 [build]
-builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+builder = "nixpacks"
+buildCommand = "npm ci && npm run build && composer install --optimize-autoloader --no-interaction"
 
 [deploy]
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
+startCommand = "bash scripts/start.sh"
 healthcheckPath = "/up"
-healthcheckTimeout = 120
-healthcheckStartPeriod = 60
+healthcheckTimeout = 600
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
