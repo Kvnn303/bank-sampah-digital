@@ -3,8 +3,20 @@ builder = "nixpacks"
 buildCommand = "composer install --no-dev --optimize-autoloader --no-interaction --no-scripts && npm ci && npm run build"
 
 [deploy]
-startCommand = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php -S 0.0.0.0:${PORT:-8000} public/index.php"
+startCommand = "sleep 5 && php -S 0.0.0.0:${PORT:-8000} public/index.php"
 healthcheckPath = "/up"
 healthcheckTimeout = 600
+healthcheckInterval = 10
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
+
+[phases.preStart]
+name = "preStart"
+# Run migrations, cache everything BEFORE the server starts
+cmds = [
+    "php artisan migrate --force",
+    "php artisan config:cache",
+    "php artisan route:cache",
+    "php artisan view:cache 2>/dev/null || true",
+    "php artisan storage:link --force 2>/dev/null || true"
+]
