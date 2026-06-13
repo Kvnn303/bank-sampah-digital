@@ -1,0 +1,12 @@
+[phases.setup]
+commands = ["curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && composer install --optimize-autoloader --no-dev --no-interaction"]
+
+[phases.build]
+commands = ["npm ci --no-audit --no-fund && npm run build"]
+
+[deploy]
+startCommand = "bash deploy.sh && php -S 0.0.0.0:${PORT}"
+healthCheckPath = "/up"
+healthCheckInterval = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
