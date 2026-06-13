@@ -15,17 +15,9 @@ mkdir -p /app/bootstrap/cache
 chmod -R 777 /app/storage
 chmod -R 777 /app/bootstrap/cache
 
-# 3. Reset link foto
-rm -rf /app/public/storage
-php artisan storage:link
+# 3. Jalankan Migrasi di latar belakang agar tidak memblokir startup
+php artisan migrate --force &
 
-# 4. Bersihkan cache
-php artisan optimize:clear
-
-# 5. Migrate database
-php artisan migrate --force
-
-echo "Persiapan selesai, menyalakan server Native PHP..."
-
-# 6. INI KUNCINYA: Gunakan PHP Native, bukan artisan serve
+# 4. Jalankan server PHP
+echo "Menyalakan server..."
 exec php -S 0.0.0.0:${PORT:-8080} -t public
