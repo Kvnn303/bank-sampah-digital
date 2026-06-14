@@ -1,35 +1,26 @@
 #!/bin/bash
 
-# Deploy script untuk Railway - RELEASE PHASE
-# Hanya dijalankan SATU KALI saat deployment, bukan setiap restart
-
-set -e
-
 echo "=== Bank Sampah Digital - Railway Release Script ==="
 
-# Generate app key jika belum ada
-if [ -z "$APP_KEY" ]; then
-    echo "Generating APP_KEY..."
-    php artisan key:generate --force
-fi
+# 1. Bangun ulang struktur folder di dalam Volume yang kosong
+echo "Membuat struktur folder storage..."
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/views
+mkdir -p storage/framework/sessions
+mkdir -p storage/logs
 
+# Beri izin tulis agar Laravel bisa menyimpan file
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
+
+# 2. Jalankan Migrasi Database
 echo "Running migrations (safe - tidak hapus data)..."
 php artisan migrate --force
 
-echo "Creating storage symlink..."
-php artisan storage:link --force 2>/dev/null || true
-
+# 3. Bersihkan dan Buat Cache Baru
 echo "Clearing caches..."
-php artisan config:clear 2>/dev/null || true
-php artisan cache:clear 2>/dev/null || true
-php artisan route:clear 2>/dev/null || true
-php artisan view:clear 2>/dev/null || true
-
-echo "Caching config/routes for production..."
-php artisan config:cache
+php artisan optimize:clear
+php artisan view:cache
 php artisan route:cache
-
-echo "Setting storage permissions..."
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
 echo "=== Release complete! ==="
