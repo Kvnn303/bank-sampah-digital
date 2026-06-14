@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "composer install --no-dev --optimize-autoloader && npm ci && npm run build"
+buildCommand = "composer install --no-dev --optimize-autoloader"
 
 [deploy]
 preDeployCommand = "bash scripts/deploy.sh"
