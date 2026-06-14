@@ -3,6 +3,6 @@ builder = "nixpacks"
 buildCommand = "composer install --no-dev --optimize-autoloader"
 
 [deploy]
-startCommand = "mkdir -p storage/app/public storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs && php artisan optimize:clear && php artisan migrate --force && php -S 0.0.0.0:${PORT:-8000} -t public public/router.php"
+startCommand = "mkdir -p storage/app/public storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs && php artisan optimize:clear && php artisan storage:link && php artisan migrate --force && php -S 0.0.0.0:${PORT:-8000} -t public public/router.php"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
