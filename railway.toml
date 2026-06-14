@@ -3,6 +3,7 @@ builder = "nixpacks"
 buildCommand = "composer install --no-dev --optimize-autoloader && npm ci && npm run build"
 
 [deploy]
+preDeployCommand = "bash scripts/deploy.sh"
 startCommand = "php -S 0.0.0.0:${PORT:-8000} -t public public/router.php"
 healthcheckPath = "/up.txt"
 healthcheckTimeout = 300
