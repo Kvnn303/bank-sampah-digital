@@ -1,21 +1,40 @@
 #!/bin/bash
+
+# Deploy script untuk Railway
+# Dijalankan DI BUILD PHASE (bukan start phase)
+
 set -e
 
-echo "=== Bank Sampah Digital - Railway Deploy ==="
+echo "=== Bank Sampah Digital - Pre-start Deployment ==="
 
-# Generate app key if not set
-if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
+# 1. Generate app key jika belum ada
+if [ -z "$APP_KEY" ]; then
     echo "Generating APP_KEY..."
-    php artisan key:generate --force 2>/dev/null
+    php artisan key:generate --force
 fi
 
+# 2. Migrate database
 echo "Running migrations..."
-php artisan migrate --force
+php artisan migrate --force --no-interaction
 
+# 3. Create storage symlink
 echo "Creating storage symlink..."
 php artisan storage:link --force 2>/dev/null || true
 
-echo "Setting storage permissions..."
+# 4. Clear caches
+echo "Clearing old caches..."
+php artisan config:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+
+# 5. Cache for production
+echo "Caching for production..."
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache 2>/dev/null || true
+
+# 6. Set permissions
+echo "Setting permissions..."
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
 echo "=== Deploy complete! ==="

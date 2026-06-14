@@ -1,10 +1,11 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "composer install --optimize-autoloader --no-dev && npm ci && npm run build"
+builder = "nixpacks"
+buildCommand = "bash -c 'composer install --optimize-autoloader --no-interaction && bash scripts/deploy.sh && npm ci && npm run build'"
 
 [deploy]
-startCommand = "php artisan serve --host=0.0.0.0 --port=${PORT}"
+startCommand = "php -S 0.0.0.0:${PORT:-8000} public/router.php"
 healthcheckPath = "/up"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 5
+startTimeout = 300

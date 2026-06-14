@@ -5,7 +5,15 @@
       "Bash(sed -n '200,215p' \"C:/laragon/www/BankSampahDigital/Web Admin/app/Http/Controllers/Web/Admin/ArtikelController.php\")",
       "Bash(php artisan *)",
       "Bash(xargs grep -l \"NotificationService\\\\|NotifiableTrait\")",
-      "Bash(php -v)"
+      "Bash(php -v)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(rm C:/laragon/www/BankSampahApp/BankSampahDigital/railway.toml && echo \"Deleted railway.toml\")",
+      "Bash(git status *)"
+    ],
+    "additionalDirectories": [
+      "C:\\laragon\\www\\BankSampahApp\\BankSampahDigital"
     ]
   }
 }

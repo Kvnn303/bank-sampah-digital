@@ -13,8 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Trust proxies dari Railway load balancer
+        // Trust proxies from Railway load balancer
         $middleware->trustProxies(at: '*');
+        $middleware->headers([
+            'X-Forwarded-Host',
+        ]);
         
         $middleware->statefulApi();
         $middleware->alias([
