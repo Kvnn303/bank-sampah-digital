@@ -1,26 +1,36 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Drop the foreign key constraint first
-        DB::statement('ALTER TABLE notifications DROP FOREIGN KEY notifications_user_id_foreign');
+        Schema::table('notifications', function (Blueprint $table) {
+            // 1. Hapus foreign key menggunakan fungsi bawaan Laravel
+            $table->dropForeign(['user_id']);
 
-        // Change the column to nullable using raw SQL
-        DB::statement('ALTER TABLE notifications MODIFY COLUMN user_id BIGINT UNSIGNED NULL');
+            // 2. Ubah kolom menjadi nullable menggunakan ->change()
+            $table->unsignedBigInteger('user_id')->nullable()->change();
 
-        // Re-add the foreign key constraint
-        DB::statement('ALTER TABLE notifications ADD CONSTRAINT notifications_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+            // 3. Pasang kembali foreign key-nya
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE notifications MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL');
-        DB::statement('ALTER TABLE notifications DROP FOREIGN KEY notifications_user_id_foreign');
-        DB::statement('ALTER TABLE notifications ADD CONSTRAINT notifications_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE');
+        Schema::table('notifications', function (Blueprint $table) {
+            // 1. Hapus foreign key
+            $table->dropForeign(['user_id']);
+
+            // 2. Kembalikan kolom menjadi NOT NULL (hapus nullable)
+            $table->unsignedBigInteger('user_id')->nullable(false)->change();
+
+            // 3. Pasang kembali foreign key-nya
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 };
