@@ -1,16 +1,10 @@
 [build]
 builder = "nixpacks"
-phases = [
-    "composer install --no-dev --optimize-autoloader --no-interaction",
-    "npm ci --no-audit",
-    "npm run build"
-]
+buildCommand = "composer install --no-dev --optimize-autoloader && npm ci && npm run build"
 
 [deploy]
-releaseCommand = "bash scripts/deploy.sh"
 startCommand = "php -S 0.0.0.0:${PORT:-8000} -t public public/router.php"
-healthcheckPath = "/up"
+healthcheckPath = "/up.txt"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
-startTimeout = 300
+restartPolicyMaxRetries = 3

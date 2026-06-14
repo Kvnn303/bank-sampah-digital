@@ -15,10 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Trust proxies from Railway load balancer
         $middleware->trustProxies(at: '*');
-        $middleware->headers([
-            'X-Forwarded-Host',
-        ]);
-        
+
         $middleware->statefulApi();
         $middleware->alias([
             'is.admin'   => \App\Http\Middleware\IsAdmin::class,

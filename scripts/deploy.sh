@@ -1,15 +1,23 @@
 #!/bin/bash
+
+# Deploy script untuk Railway - RELEASE PHASE
+# Hanya dijalankan SATU KALI saat deployment, bukan setiap restart
+
 set -e
 
-echo "=== Bank Sampah Digital - Deploy Script ==="
-echo "Script ini sekarang opsional. Railway menjalankan release phase otomatis."
-echo ""
+echo "=== Bank Sampah Digital - Railway Release Script ==="
 
-echo "Running migrations..."
-php artisan migrate --force 2>/dev/null || echo "Migration skipped (might already be applied)"
+# Generate app key jika belum ada
+if [ -z "$APP_KEY" ]; then
+    echo "Generating APP_KEY..."
+    php artisan key:generate --force
+fi
+
+echo "Running migrations (safe - tidak hapus data)..."
+php artisan migrate --force
 
 echo "Creating storage symlink..."
-php artisan storage:link --force 2>/dev/null || echo "Storage link creation skipped"
+php artisan storage:link --force 2>/dev/null || true
 
 echo "Clearing caches..."
 php artisan config:clear 2>/dev/null || true
@@ -17,11 +25,11 @@ php artisan cache:clear 2>/dev/null || true
 php artisan route:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 
-echo "Re-caching for production..."
+echo "Caching config/routes for production..."
 php artisan config:cache
 php artisan route:cache
 
-echo "Setting permissions..."
+echo "Setting storage permissions..."
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
-echo "=== Deploy complete! ==="
+echo "=== Release complete! ==="
