@@ -9,18 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('nasabah', function (Blueprint $table) {
-            $table->enum('status_akun', ['pending', 'verified', 'active', 'nonaktif'])
-                  ->default('pending')
-                  ->change();
+            // Ubah tipe enum menjadi string biasa agar kompatibel dengan PostgreSQL
+            $table->string('status_akun')->default('pending')->change();
         });
     }
 
     public function down(): void
     {
         Schema::table('nasabah', function (Blueprint $table) {
-            $table->enum('status_akun', ['pending', 'verified', 'active'])
-                  ->default('pending')
-                  ->change();
+            $table->string('status_akun')->default('pending')->change();
         });
     }
 };
