@@ -166,12 +166,22 @@
             text-decoration: none; display: inline-flex; align-items: center; gap: 10px; border: 2px solid transparent;
         }
         .btn-hero-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4); border-color: rgba(255,255,255,0.3); }
+
         .btn-hero-secondary {
             background: white; color: var(--dark) !important; border-radius: 50rem; padding: 1.1rem 2.2rem; font-weight: 700;
             font-size: 1.05rem; transition: all 0.3s; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.05);
         }
         .btn-hero-secondary:hover { color: var(--primary-dark) !important; transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--primary-light); }
+
+        /* TOMBOL APK TAMBAHAN */
+        .btn-hero-dark {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: white !important; border-radius: 50rem; padding: 1.1rem 2.2rem; font-weight: 700; font-size: 1.05rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+            text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-hero-dark:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.2); }
 
         .hero-stat-num { font-size: 2.5rem; font-weight: 900; color: var(--dark); letter-spacing: -1px; line-height: 1.2; }
         .hero-stat-label { font-weight: 600; color: var(--slate); font-size: 0.95rem; }
@@ -430,10 +440,28 @@
                     <p class="hero-desc">
                         Ubah kebiasaan membuang sampah menjadi menabung. Dapatkan penghasilan tambahan dan bantu wujudkan Kabupaten Subang yang bersih dan lestari.
                     </p>
-                    <div class="hero-buttons mb-5">
+
+                    <div class="hero-buttons mb-3 d-flex flex-wrap gap-2">
                         <a href="#harga" class="btn-hero-primary">Cek Harga Hari Ini</a>
                         <a href="#cara-kerja" class="btn-hero-secondary">Pelajari Caranya</a>
                     </div>
+
+                    <div class="mb-5" style="max-width: 420px;">
+                        <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn-hero-dark w-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M4 10l0 6"></path>
+                                <path d="M20 10l0 6"></path>
+                                <path d="M7 9h10v8a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-8a5 5 0 0 1 10 0"></path>
+                                <path d="M8 3l1 2"></path>
+                                <path d="M16 3l-1 2"></path>
+                                <path d="M9 18l0 3"></path>
+                                <path d="M15 18l0 3"></path>
+                            </svg>
+                            Download Aplikasi Mobile (APK)
+                        </a>
+                    </div>
+
                     <div class="hero-stats d-flex gap-5">
                         <div>
                             <div class="hero-stat-num"><span class="counter" data-target="{{ $totalNasabah ?? 0 }}">0</span>+</div>
@@ -739,11 +767,18 @@
         <div class="container">
             <div class="cta-box" data-aos="zoom-in">
                 <h2 class="cta-title fw-bolder mb-3 fs-1">Siap Wujudkan Lingkungan Bersih?</h2>
-                <p class="cta-desc mx-auto mb-5 text-white-50 fs-5" style="max-width: 600px;">Pendaftaran gratis. Mulai kelola sampahmu hari ini dan nikmati manfaat ekonominya untuk keluarga.</p>
-                <a href="{{ route('admin.login') ?? '#' }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-success d-inline-flex align-items-center gap-2 shadow-lg" style="transition: transform 0.3s;">
-                    Gabung Sekarang
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
+                <p class="cta-desc mx-auto mb-4 text-white-50 fs-5" style="max-width: 600px;">Pendaftaran gratis. Mulai kelola sampahmu hari ini dan nikmati manfaat ekonominya untuk keluarga.</p>
+
+                <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+                    <a href="{{ route('admin.login') ?? '#' }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-success d-inline-flex align-items-center gap-2 shadow-lg" style="transition: transform 0.3s;">
+                        Gabung Sekarang
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn border border-light border-opacity-25 text-white rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center gap-2" style="background: rgba(255,255,255,0.05); transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 10l0 6"></path><path d="M20 10l0 6"></path><path d="M7 9h10v8a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-8a5 5 0 0 1 10 0"></path><path d="M8 3l1 2"></path><path d="M16 3l-1 2"></path><path d="M9 18l0 3"></path><path d="M15 18l0 3"></path></svg>
+                        Download APK
+                    </a>
+                </div>
             </div>
         </div>
     </div>
