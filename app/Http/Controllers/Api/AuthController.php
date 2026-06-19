@@ -90,34 +90,73 @@ class AuthController extends Controller
                 'status'      => 'failed',
             ]);
 
-            // Gunakan JSON 401 (Unauthorized) untuk API, BUKAN Exception
             return response()->json([
                 'success' => false,
                 'message' => 'Email atau password salah.'
             ], 401);
         }
 
-        // 2. Cek Akun Dinonaktifkan (Perbaikan Logika Utama)
+        // 2. Cek Validasi Status Aktivasi & Verifikasi Nasabah
         $nasabah = $user->nasabah;
-        if (! $user->is_active || ($nasabah && $nasabah->status_akun === 'nonaktif')) {
+
+        // A. Pengecekan jika user dinonaktifkan secara global di tabel users
+        if (! $user->is_active) {
             AuditLog::create([
                 'user_name'   => $user->name,
                 'action'      => 'LOGIN_BLOCKED',
                 'module'      => 'Auth',
-                'description' => "Login ditolak, akun {$user->name} dinonaktifkan",
+                'description' => "Login ditolak, user_id {$user->id} berstatus is_active = 0",
                 'ip_address'  => $request->ip(),
                 'user_agent'  => $request->userAgent(),
                 'status'      => 'failed',
             ]);
 
-            // Gunakan JSON 403 (Forbidden)
             return response()->json([
                 'success' => false,
                 'message' => 'Akun Anda dinonaktifkan. Hubungi Admin Bank Sampah.'
             ], 403);
         }
 
-        // 3. Generate Token Sanctum
+        // B. Pengecekan khusus untuk data nasabah
+        if ($nasabah) {
+            // Blokir jika status masih PENDING (Belum Diverifikasi)
+            if ($nasabah->status_akun === 'pending') {
+                AuditLog::create([
+                    'user_name'   => $user->name,
+                    'action'      => 'LOGIN_PENDING',
+                    'module'      => 'Auth',
+                    'description' => "Login ditolak, akun nasabah {$user->name} masih berstatus pending/belum diverifikasi",
+                    'ip_address'  => $request->ip(),
+                    'user_agent'  => $request->userAgent(),
+                    'status'      => 'failed',
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akun Anda belum diverifikasi oleh Admin. Mohon tunggu hingga proses verifikasi selesai.'
+                ], 403);
+            }
+
+            // Blokir jika status diubah menjadi NONAKTIF oleh admin
+            if ($nasabah->status_akun === 'nonaktif') {
+                AuditLog::create([
+                    'user_name'   => $user->name,
+                    'action'      => 'LOGIN_BLOCKED',
+                    'module'      => 'Auth',
+                    'description' => "Login ditolak, akun nasabah {$user->name} dinonaktifkan oleh admin",
+                    'ip_address'  => $request->ip(),
+                    'user_agent'  => $request->userAgent(),
+                    'status'      => 'failed',
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akun Anda dinonaktifkan. Hubungi Admin Bank Sampah.'
+                ], 403);
+            }
+        }
+
+        // 3. Generate Token Sanctum jika status_akun === 'active' (Lolos semua validasi di atas)
         $token = $user->createToken('auth_token')->plainTextToken;
 
         AuditLogService::log(
@@ -127,7 +166,6 @@ class AuthController extends Controller
             status: 'success'
         );
 
-        // Catat juga ke tabel notifications agar badge & list modal Log Aktivitas mobile sinkron
         NotificationService::send(
             targetRole: $user->role,
             type:        Notification::TYPE_AUTH,
