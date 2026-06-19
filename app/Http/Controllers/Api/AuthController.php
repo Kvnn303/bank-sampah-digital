@@ -181,7 +181,6 @@ class AuthController extends Controller
                                 ->count();
         }
 
-
         return response()->json([
             'success'         => true,
             'user'            => $user,
@@ -234,6 +233,58 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Profil berhasil diupdate',
+        ], 200);
+    }
+
+    // --- FITUR BARU: UBAH PASSWORD DARI PROFIL ---
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password'         => 'required|string|min:6|confirmed',
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required'         => 'Password baru wajib diisi.',
+            'password.min'              => 'Password baru minimal 6 karakter.',
+            'password.confirmed'        => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = $request->user();
+
+        // 1. Cek apakah password lama yang diinputkan sesuai dengan di database
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password saat ini yang Anda masukkan salah.',
+            ], 400);
+        }
+
+        // 2. Cek apakah password baru sama dengan password lama
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'errors'  => [
+                    'password' => ['Password baru tidak boleh sama dengan password saat ini.']
+                ]
+            ], 422);
+        }
+
+        // 3. Update password di tabel users
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        // 4. Catat ke Audit Log
+        AuditLogService::log(
+            action: 'CHANGE_PASSWORD',
+            module: 'Auth',
+            description: "User {$user->name} berhasil mengubah password dari aplikasi Mobile",
+            status: 'success'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil diubah. Silakan gunakan password baru Anda.',
         ], 200);
     }
 

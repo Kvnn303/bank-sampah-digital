@@ -31,9 +31,13 @@ Route::get('/artikels', [ArtikelController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth & Profil (Berlaku untuk Admin & Nasabah)
-    Route::get('/profile',         [AuthController::class, 'profile']);
-    Route::post('/profile/update', [AuthController::class, 'updateProfile']);
-    Route::post('/logout',         [AuthController::class, 'logout']);
+    Route::get('/profile',                 [AuthController::class, 'profile']);
+    Route::post('/profile/update',         [AuthController::class, 'updateProfile']);
+
+    // --- TAMBAHAN BARU: Rute untuk Ubah Password ---
+    Route::post('/profile/change-password', [AuthController::class, 'changePassword']);
+
+    Route::post('/logout',                 [AuthController::class, 'logout']);
 
     // Notifikasi (Mobile Banking)
     Route::prefix('notifications')->group(function () {
