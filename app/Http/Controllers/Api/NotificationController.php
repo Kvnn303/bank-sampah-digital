@@ -31,7 +31,7 @@ class NotificationController extends Controller
 
     /**
      * POST /api/notifications/{id}/read
-     * Mengubah is_read = true dan read_at = now() untuk satu notifikasi.
+     * Mengubah is_read = true, status = 'read', dan read_at = now() untuk satu notifikasi.
      */
     public function markAsRead(string $id): JsonResponse
     {
@@ -41,7 +41,14 @@ class NotificationController extends Controller
             return response()->json(['message' => 'Notifikasi tidak ditemukan'], 404);
         }
 
-        $notif->markAsRead();
+        // Sinkronisasi pembaruan untuk kedua kolom
+        if ($notif->status === 'unread' || !$notif->is_read) {
+            $notif->update([
+                'is_read' => true,
+                'status'  => 'read',
+                'read_at' => now()
+            ]);
+        }
 
         return response()->json([
             'message' => 'Notifikasi ditandai sudah dibaca',
@@ -50,13 +57,21 @@ class NotificationController extends Controller
 
     /**
      * POST /api/notifications/read-all
-     * Mengubah semua is_read = true untuk seluruh notifikasi milik user yang belum dibaca.
+     * Mengubah semua is_read = true dan status = 'read' untuk seluruh notifikasi milik user yang belum dibaca.
      */
     public function markAllAsRead(): JsonResponse
     {
+        // Cari yang is_read-nya false atau statusnya 'unread', lalu perbarui keduanya
         $updated = Notification::where('user_id', auth()->id())
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
+            ->where(function($query) {
+                $query->where('is_read', false)
+                      ->orWhere('status', 'unread');
+            })
+            ->update([
+                'is_read' => true,
+                'status'  => 'read',
+                'read_at' => now()
+            ]);
 
         return response()->json([
             'message' => "{$updated} notifikasi ditandai sudah dibaca",

@@ -242,10 +242,7 @@
 
                     <td class="text-end d-none d-sm-table-cell">
                         @php
-                            // Pastikan variabel saldo nasabah di-load (disesuaikan dengan nama accessor/relasi dari Claude)
                             $sisaSaldo = $p->nasabah->saldo_realtime ?? 0;
-
-                            // Hitung saldo awal. Jika status belum ditolak, berarti saldo sudah terpotong di sistem.
                             $saldoAwal = in_array($p->status, ['pending', 'diproses', 'selesai'])
                                          ? $sisaSaldo + $p->nominal
                                          : $sisaSaldo;
@@ -319,13 +316,10 @@
                                 @if($p->status == 'diproses')
                                     <li><hr class="dropdown-divider my-1 border-slate-100"></li>
                                     <li>
-                                        <form method="POST" action="{{ route('admin.penarikan.selesai', $p->id) }}" onsubmit="return confirm('Tandai sebagai selesai? Pastikan uang tunai telah diterima oleh nasabah.')">
-                                            @csrf @method('PUT')
-                                            <button type="submit" class="dropdown-item d-flex align-items-center text-blue-modern fw-semibold">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m6 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0" /></svg>
-                                                Tandai Selesai
-                                            </button>
-                                        </form>
+                                        <button type="button" class="dropdown-item d-flex align-items-center text-blue-modern fw-semibold border-0 bg-transparent w-100 text-start" data-bs-toggle="modal" data-bs-target="#modalSelesai" onclick="setSelesaiAction({{ $p->id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m6 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0" /></svg>
+                                            Tandai Selesai
+                                        </button>
                                     </li>
                                 @endif
                             </ul>
@@ -401,13 +395,96 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalSelesai" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-white border-bottom p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-emerald-lt" style="width: 40px; height: 40px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-emerald" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m6 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0" /></svg>
+                    </div>
+                    <h5 class="modal-title fw-bold text-dark fs-4 mb-0">Selesaikan Penarikan</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formSelesai" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="alert alert-info bg-blue-lt border-0 text-blue-modern mb-4">
+                        <div class="d-flex align-items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 flex-shrink-0 mt-1" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                            <span class="small fw-medium">Pastikan dana telah diserahkan atau ditransfer kepada nasabah sebelum menekan tombol Selesai.</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold small">Bukti Transfer/Penyerahan <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <input type="file" name="bukti_transfer" class="form-control shadow-sm" id="inputBuktiTransfer" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(event)">
+                        <div class="text-muted small mt-1">Format: JPG, JPEG, PNG. Maksimal 2MB.</div>
+
+                        <div class="mt-3 text-center d-none" id="previewContainer">
+                            <img id="imagePreview" src="#" alt="Preview Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 200px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label text-dark fw-bold small">Catatan Tambahan <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <textarea name="catatan_admin"
+                                  class="form-control shadow-sm"
+                                  rows="2"
+                                  style="resize: none;"
+                                  placeholder="Contoh: Dana telah ditransfer ke DANA 08xxx / Uang diambil langsung..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-slate-50 border-top p-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-light border fw-semibold shadow-sm rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success bg-emerald fw-bold text-white border-0 shadow-sm rounded-pill px-4 d-flex align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-white" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M5 12l5 5l10 -10" /></svg>
+                        Konfirmasi Selesai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
-function setTolakAction(id) {
-    const form = document.getElementById('formTolak');
-    form.action = '/admin/penarikan/' + id + '/tolak';
-}
+    // JS Untuk Form Tolak
+    function setTolakAction(id) {
+        const form = document.getElementById('formTolak');
+        form.action = '/admin/penarikan/' + id + '/tolak';
+    }
+
+    // JS Untuk Form Selesai
+    function setSelesaiAction(id) {
+        const form = document.getElementById('formSelesai');
+        form.action = '/admin/penarikan/' + id + '/selesai';
+
+        // Reset form preview setiap kali modal dibuka untuk transaksi baru
+        document.getElementById('inputBuktiTransfer').value = '';
+        document.getElementById('previewContainer').classList.add('d-none');
+    }
+
+    // JS Untuk Live Image Preview
+    function previewImage(event) {
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                previewContainer.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.classList.add('d-none');
+        }
+    }
 </script>
 @endpush

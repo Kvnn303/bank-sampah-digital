@@ -78,7 +78,6 @@
 <div class="row g-4 justify-content-center">
     <div class="col-lg-10 col-xl-9">
 
-        <!-- FLASH MESSAGES - PINDAH KE ATAS -->
         @if(session('error'))
         <div class="alert alert-danger d-flex align-items-center rounded-3 mb-4 shadow-sm" role="alert">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -93,7 +92,6 @@
         </div>
         @endif
 
-        <!-- VALIDATION ERRORS -->
         @if($errors->any())
         <div class="alert alert-warning d-flex align-items-start rounded-3 mb-4 shadow-sm" role="alert">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 mt-0 flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -150,7 +148,6 @@
         </div>
 
         <div class="row g-4 mb-4">
-
             <div class="col-md-6">
                 <div class="card card-modern h-100">
                     <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
@@ -239,6 +236,23 @@
                                 <div class="text-danger small">{{ $penarikan->alasan_penolakan }}</div>
                             </div>
                         @endif
+
+                        @if($penarikan->status == 'selesai' && $penarikan->bukti_transfer)
+                            <div class="mt-3 p-3 border rounded-3 bg-light text-center">
+                                <div class="text-slate-500 fw-semibold small mb-2 text-start">Bukti Transfer/Penyerahan:</div>
+                                <a href="{{ asset('storage/' . $penarikan->bukti_transfer) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $penarikan->bukti_transfer) }}" alt="Bukti Transfer" class="img-fluid rounded border shadow-sm" style="max-height: 150px; object-fit: contain;">
+                                </a>
+                                <div class="text-muted small mt-2 fst-italic">Klik gambar untuk memperbesar</div>
+                            </div>
+                        @endif
+
+                        @if($penarikan->status == 'selesai' && $penarikan->catatan_admin)
+                            <div class="mt-3 p-3 rounded-3 text-start" style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+                                <div class="text-emerald fw-bold small mb-1">Catatan Admin:</div>
+                                <div class="text-dark small">{{ $penarikan->catatan_admin }}</div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -266,13 +280,10 @@
                 @endif
 
                 @if($penarikan->status == 'diproses')
-                    <form method="POST" action="{{ route('admin.penarikan.selesai', $penarikan->id) }}" id="formSelesai">
-                        @csrf @method('PUT')
-                        <button type="submit" class="btn btn-success rounded-pill fw-bold shadow-sm px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                            Tandai Penarikan Selesai
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-success rounded-pill fw-bold shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#modalSelesai">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        Tandai Penarikan Selesai
+                    </button>
                 @endif
             </div>
         </div>
@@ -280,7 +291,6 @@
     </div>
 </div>
 
-<!-- MODAL TOLAK - SUDAH DIPERBAIKI -->
 <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-0">
@@ -303,9 +313,9 @@
                     </div>
                     <div class="mb-0">
                         <label for="alasan_penolakan" class="form-label text-dark fw-bold small">Alasan Penolakan <span class="text-danger">*</span></label>
-                        <textarea name="alasan_penolakan" 
+                        <textarea name="alasan_penolakan"
                                   id="alasan_penolakan"
-                                  class="form-control shadow-sm" 
+                                  class="form-control shadow-sm"
                                   rows="3"
                                   style="resize: none;"
                                   placeholder="Tuliskan alasan penolakan minimal 10 karakter..."
@@ -336,6 +346,60 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalSelesai" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-white border-bottom p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-emerald-lt" style="width: 40px; height: 40px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-emerald" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m6 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0" /></svg>
+                    </div>
+                    <h5 class="modal-title fw-bold text-dark fs-4 mb-0">Selesaikan Penarikan</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formSelesai" action="{{ route('admin.penarikan.selesai', $penarikan->id) }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="alert alert-info bg-blue-lt border-0 text-blue-modern mb-4">
+                        <div class="d-flex align-items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 flex-shrink-0 mt-1" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                            <span class="small fw-medium">Pastikan dana telah diserahkan atau ditransfer kepada nasabah sebelum menekan tombol Selesai.</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-bold small">Bukti Transfer/Penyerahan <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <input type="file" name="bukti_transfer" class="form-control shadow-sm" id="inputBuktiTransfer" accept="image/png, image/jpeg, image/jpg" onchange="previewImage(event)">
+                        <div class="text-muted small mt-1">Format: JPG, JPEG, PNG. Maksimal 2MB.</div>
+
+                        <div class="mt-3 text-center d-none" id="previewContainer">
+                            <img id="imagePreview" src="#" alt="Preview Bukti" class="img-fluid rounded border shadow-sm" style="max-height: 200px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label text-dark fw-bold small">Catatan Tambahan <span class="text-muted fw-normal">(Opsional)</span></label>
+                        <textarea name="catatan_admin"
+                                  class="form-control shadow-sm"
+                                  rows="2"
+                                  style="resize: none;"
+                                  placeholder="Contoh: Dana telah ditransfer ke DANA 08xxx / Uang diambil langsung..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-slate-50 border-top p-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-light border fw-semibold shadow-sm rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success bg-emerald fw-bold text-white border-0 shadow-sm rounded-pill px-4 d-flex align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-white" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M5 12l5 5l10 -10" /></svg>
+                        Konfirmasi Selesai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -353,8 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
     textarea.addEventListener('input', function() {
         const len = this.value.length;
         charCount.textContent = len + '/500';
-        
-        // Update warna berdasarkan panjang
+
         charCount.className = 'char-count';
         if (len < 10) {
             charCount.classList.add('danger');
@@ -371,24 +434,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Reset form saat modal dibuka
-    modalTolak.addEventListener('show.bs.modal', function() {
-        formTolak.reset();
-        isSubmitting = false;
-        btnSubmitTolak.disabled = false;
-        charCount.textContent = '0/500';
-        charCount.className = 'char-count text-muted';
-        validationMsg.classList.add('d-none');
-        textarea.classList.remove('is-invalid');
-        btnSubmitTolak.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span class="btn-text">Konfirmasi Penolakan</span>
-        `;
-    });
-
-    // Handle submit
+    // Handle submit Tolak
     formTolak.addEventListener('submit', function(e) {
-        // Cegah double submit
         if (isSubmitting) {
             e.preventDefault();
             return false;
@@ -396,7 +443,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const alasan = textarea.value.trim();
 
-        // Validasi: minimal 10 karakter (SINKRON DENGAN CONTROLLER)
         if (alasan.length < 10) {
             e.preventDefault();
             textarea.focus();
@@ -405,15 +451,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        // Set loading state - TANPA pointer-events: none
         isSubmitting = true;
         btnSubmitTolak.disabled = true;
         btnSubmitTolak.innerHTML = `
             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             Memproses...
         `;
-
-        // Form akan submit secara normal
     });
 
     // Form setujui
@@ -431,12 +474,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const formSelesai = document.getElementById('formSelesai');
     if (formSelesai) {
         formSelesai.addEventListener('submit', function(e) {
-            if (!confirm('Tandai sebagai selesai? Pastikan uang tunai telah diterima oleh nasabah!')) {
+            if (!confirm('Tandai sebagai selesai? Pastikan uang tunai/transfer telah diterima oleh nasabah!')) {
                 e.preventDefault();
                 return false;
             }
         });
     }
 });
+
+// JS Untuk Live Image Preview di Modal Selesai
+function previewImage(event) {
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const file = event.target.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            previewContainer.classList.remove('d-none');
+        }
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.classList.add('d-none');
+    }
+}
 </script>
 @endpush

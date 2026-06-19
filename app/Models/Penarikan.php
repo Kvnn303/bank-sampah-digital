@@ -18,6 +18,7 @@ class Penarikan extends Model
         'tanggal_ambil',
         'catatan_nasabah',
         'catatan_admin',
+        'bukti_transfer', // <--- INI TAMBAHANNYA
     ];
 
     protected $casts = [

@@ -11,11 +11,13 @@ use App\Services\NotificationService;
 use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PenarikanNasabahController extends Controller
 {
     use NotifiableTrait;
-    // GET daftar pengajuan penarikan nasabah
+
+    // GET daftar pengajuan penarikan nasabah beserta Struk Digital & Bukti Foto
     public function index(Request $request)
     {
         $nasabah = $request->user()->nasabah;
@@ -26,9 +28,38 @@ class PenarikanNasabahController extends Controller
             ], 404);
         }
 
-        $penarikan = Penarikan::where('nasabah_id', $nasabah->id)
+        // Muat relasi 'diprosesoleh' agar aplikasi mobile tahu admin/petugas yang memproses pencairan dana
+        $penarikan = Penarikan::with(['diprosesoleh'])
+                        ->where('nasabah_id', $nasabah->id)
                         ->orderByDesc('created_at')
                         ->paginate(10);
+
+        // Transformasi data koleksi di dalam paginasi agar menyertakan objek struk_digital terformat
+        $penarikan->getCollection()->transform(function ($item) {
+            $nominalFormatted = 'Rp' . number_format($item->nominal, 0, ',', '.');
+            $waktuProses = $item->tanggal_proses ? Carbon::parse($item->tanggal_proses)->format('d M Y, H:i:s') . ' WIB' : '-';
+            $namaAdmin = $item->diprosesoleh ? $item->diprosesoleh->name : 'Admin Sistem';
+
+            // Membuat kombinasi nomor referensi unik agar serasi dengan sistem admin panel web
+            $nomorReferensi = $item->tanggal_proses
+                ? 'TRX-WD-' . date('Ymd', strtotime($item->tanggal_proses)) . '-' . str_pad($item->id, 4, '0', STR_PAD_LEFT)
+                : 'TRX-WD-' . date('Ymd', strtotime($item->created_at)) . '-' . str_pad($item->id, 4, '0', STR_PAD_LEFT);
+
+            // Menyisipkan struk_digital ke respon data agar mempermudah rendering layout di React Native
+            $item->struk_digital = [
+                'nomor_referensi' => $nomorReferensi,
+                'status'          => strtoupper($item->status),
+                'waktu_proses'    => $waktuProses,
+                'diproses_oleh'   => $namaAdmin,
+                'nominal_cair'    => $nominalFormatted,
+                'metode'          => $item->catatan_nasabah ?? 'Ambil Tunai',
+                'catatan_admin'   => $item->catatan_admin ?? '-',
+                'alasan_penolakan'=> $item->alasan_penolakan ?? '-',
+                'link_foto_bukti' => $item->bukti_transfer ? asset('storage/' . $item->bukti_transfer) : null,
+            ];
+
+            return $item;
+        });
 
         return response()->json($penarikan);
     }
@@ -54,19 +85,18 @@ class PenarikanNasabahController extends Controller
         $request->validate([
             'nominal'          => 'required|numeric|min:10000',
             'metode'           => 'required|string',
-            'tanggal_ambil'    => 'required|date|after_or_equal:today', // Menangkap tanggal dari HP nasabah
+            'tanggal_ambil'    => 'required|date|after_or_equal:today',
             'catatan_nasabah'  => 'nullable|string',
         ]);
 
-        // Hitung saldo aktif real-time
-        // Hanya penarikan yang SUDAH selesai yang mengurangi saldo
+        // Hitung saldo aktif real-time (Hanya penarikan berstatus 'selesai' yang memotong saldo)
         $totalTabungan = (float) Tabungan::where('nasabah_id', $nasabah->id)->sum('nilai_rupiah');
         $totalPenarikan = (float) Penarikan::where('nasabah_id', $nasabah->id)
                             ->where('status', 'selesai')
                             ->sum('nominal');
         $saldoAktif = $totalTabungan - $totalPenarikan;
 
-        // Cek saldo cukup
+        // Cek kecukupan saldo
         if ($saldoAktif < $request->nominal) {
             return response()->json([
                 'message' => 'Saldo tidak mencukupi',
@@ -75,7 +105,7 @@ class PenarikanNasabahController extends Controller
             ], 400);
         }
 
-        // Cek tidak ada penarikan pending
+        // Mencegah nasabah mengajukan penarikan ganda jika ada yang masih pending
         $penarikanPending = Penarikan::where('nasabah_id', $nasabah->id)
                                 ->where('status', 'pending')
                                 ->exists();
@@ -86,7 +116,7 @@ class PenarikanNasabahController extends Controller
             ], 400);
         }
 
-        // Format Catatan (Gabungkan Metode + Teks Catatan Nasabah)
+        // Format Catatan internal penarikan
         $metodeLabel = $request->metode === 'whatsapp' ? 'Transfer WA' : 'Ambil Tunai';
         $teksCatatan = $request->catatan_nasabah ? " - " . $request->catatan_nasabah : "";
         $catatanAkhir = "[Metode: " . $metodeLabel . "]" . $teksCatatan;
@@ -95,7 +125,7 @@ class PenarikanNasabahController extends Controller
             'nasabah_id'      => $nasabah->id,
             'nominal'         => $request->nominal,
             'status'          => 'pending',
-            'tanggal_ambil'   => $request->tanggal_ambil, // Disimpan ke database
+            'tanggal_ambil'   => $request->tanggal_ambil,
             'catatan_nasabah' => $catatanAkhir,
         ]);
 
@@ -106,21 +136,20 @@ class PenarikanNasabahController extends Controller
             newData: $penarikan->toArray()
         );
 
-        // Notif ke admin
         $nominal = 'Rp' . number_format($penarikan->nominal, 0, ',', '.');
         NotificationService::penarikanBaru($nasabah->nama_lengkap, $nominal);
 
-        // 🔔 TRIGGER: Notifikasi ke Nasabah bahwa pengajuan penarikan berhasil diajukan (Pending)
+        // 🔔 TRIGGER: Notifikasi ke internal sistem nasabah
         $this->notifyPenarikanPending($nasabah->user_id, $nasabah->nama_lengkap, $nominal);
 
-        // Notifikasi langsung ke mobile via Notification model (tabungan type)
         try {
             Notification::create([
-                'user_id'  => $nasabah->user_id,
-                'type'     => 'tabungan',
-                'title'    => 'Penarikan Sedang Diproses',
-                'message'  => 'Permintaan penarikan saldo Anda sebesar ' . $nominal . ' sedang diproses.',
-                'is_read'  => false,
+                'user_id'   => $nasabah->user_id,
+                'type'      => 'tabungan',
+                'title'     => 'Penarikan Sedang Diproses',
+                'message'   => 'Permintaan penarikan saldo Anda sebesar ' . $nominal . ' sedang diproses.',
+                'status'    => 'unread',
+                'priority'  => 'normal'
             ]);
         } catch (\Exception $e) {
             Log::warning('Gagal menyimpan notifikasi penarikan: ' . $e->getMessage());
@@ -159,7 +188,6 @@ class PenarikanNasabahController extends Controller
             ], 400);
         }
 
-        // Log audit pembatalan
         AuditLogService::log(
             action: 'PENARIKAN_BATAL',
             module: 'Penarikan',
@@ -167,7 +195,6 @@ class PenarikanNasabahController extends Controller
             oldData: $penarikan->toArray()
         );
 
-        // PERBAIKAN 2: Dihapus dari tabel, karena enum database tidak punya 'dibatalkan'
         $penarikan->delete();
 
         return response()->json([

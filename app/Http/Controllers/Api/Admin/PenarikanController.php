@@ -10,11 +10,12 @@ use App\Services\AuditLogService;
 use App\Services\NotificationService;
 use App\Traits\NotifiableTrait;
 use Illuminate\Http\Request;
-use Carbon\Carbon; // ✅ PERBAIKAN: Import Carbon
+use Carbon\Carbon;
 
 class PenarikanController extends Controller
 {
     use NotifiableTrait;
+
     // GET semua pengajuan penarikan
     public function index(Request $request)
     {
@@ -59,7 +60,7 @@ class PenarikanController extends Controller
 
         $nasabah = $penarikan->nasabah;
 
-        // ✅ PERBAIKAN: Hitung saldo manual agar tidak Error 500 ($nasabah->saldo tidak ada di database)
+        // Hitung saldo manual agar tidak Error 500
         $totalTabungan = Tabungan::where('nasabah_id', $nasabah->id)->sum('nilai_rupiah');
 
         // Hitung penarikan lain yang sudah selesai (selain ID ini)
@@ -105,10 +106,11 @@ class PenarikanController extends Controller
         ]);
     }
 
-    // PUT selesaikan penarikan → nasabah sudah ambil uang
+    // PUT selesaikan penarikan → nasabah sudah ambil uang / admin transfer bukti
     public function selesai(Request $request, $id)
     {
-        $penarikan = Penarikan::with('nasabah')->findOrFail($id);
+        // Memuat relasi diprosesoleh untuk mendapatkan data nama profil admin yang memvalidasi
+        $penarikan = Penarikan::with(['nasabah', 'diprosesoleh'])->findOrFail($id);
 
         if ($penarikan->status !== 'diproses') {
             return response()->json([
@@ -116,30 +118,58 @@ class PenarikanController extends Controller
             ], 400);
         }
 
+        // 1. Validasi input file gambar bukti transfer dan catatan administrasi
+        $request->validate([
+            'catatan_admin'  => 'nullable|string',
+            'bukti_transfer' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // Batasan ukuran file maksimal 2MB
+        ]);
+
+        // 2. Pemrosesan penyimpanan file gambar bukti transfer ke direktori publik
+        $buktiPath = null;
+        if ($request->hasFile('bukti_transfer')) {
+            $buktiPath = $request->file('bukti_transfer')->store('bukti_penarikan', 'public');
+        }
+
+        // 3. Memperbarui rekaman data transaksi penarikan di database
         $penarikan->update([
-            'status'        => 'selesai',
-            'catatan_admin' => $request->catatan_admin,
+            'status'         => 'selesai',
+            'catatan_admin'  => $request->catatan_admin,
+            'bukti_transfer' => $buktiPath,
         ]);
 
         $nominal = 'Rp' . number_format($penarikan->nominal, 0, ',', '.');
-
-        // ✅ PERBAIKAN: Gunakan Carbon::parse agar aman dari error to string format
         $tanggal = $penarikan->tanggal_ambil ? Carbon::parse($penarikan->tanggal_ambil)->format('d M Y') : '-';
 
+        // 4. Pencatatan rekam jejak aktivitas ke dalam Audit Log sistem
         AuditLogService::log(
             action: 'PENARIKAN_SELESAI',
             module: 'Penarikan',
-            description: "Penarikan {$nominal} nasabah {$penarikan->nasabah->nama_lengkap} selesai",
+            description: "Penarikan {$nominal} nasabah {$penarikan->nasabah->nama_lengkap} selesai" . ($buktiPath ? " (Disertai Bukti Foto)" : ""),
             oldData: ['status' => 'diproses'],
-            newData: ['status' => 'selesai']
+            newData: ['status' => 'selesai', 'bukti_transfer' => $buktiPath]
         );
 
-        // 🔔 TRIGGER MOBILE BANKING: Notifikasi transaksi berhasil dicairkan → Status Selesai
+        // 5. 🔔 TRIGGER MOBILE BANKING: Kirim notifikasi konfirmasi penarikan berhasil dicairkan ke aplikasi nasabah
         $this->notifyPenarikanSelesai($penarikan->nasabah->user_id, $nominal, $tanggal);
 
+        // 6. Penyusunan data Struk Digital terstruktur untuk kebutuhan otentikasi di aplikasi mobile
+        $namaAdmin = $penarikan->diprosesoleh ? $penarikan->diprosesoleh->name : 'Admin Sistem';
+        $nomorReferensi = 'TRX-WD-' . date('Ymd', strtotime($penarikan->tanggal_proses)) . '-' . str_pad($penarikan->id, 4, '0', STR_PAD_LEFT);
+        $waktuProses = Carbon::parse($penarikan->tanggal_proses)->format('d M Y, H:i:s') . ' WIB';
+
         return response()->json([
-            'message'   => 'Penarikan selesai, uang sudah diterima nasabah',
+            'message'   => 'Penarikan selesai, uang sudah dicairkan ke nasabah',
             'penarikan' => $penarikan,
+            'struk_digital' => [
+                'nomor_referensi' => $nomorReferensi,
+                'status'          => 'BERHASIL',
+                'waktu_proses'    => $waktuProses,
+                'diproses_oleh'   => $namaAdmin,
+                'nominal_cair'    => $nominal,
+                'metode'          => $penarikan->catatan_nasabah ?? 'Ambil Tunai',
+                'catatan_admin'   => $penarikan->catatan_admin ?? '-',
+                'link_foto_bukti' => $buktiPath ? asset('storage/' . $buktiPath) : null,
+            ]
         ]);
     }
 

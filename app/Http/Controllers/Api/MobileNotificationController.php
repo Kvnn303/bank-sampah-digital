@@ -14,9 +14,9 @@ class MobileNotificationController extends Controller
      * Ambil 10 notifikasi terbaru milik user yang sedang login
      * (yang sudah dibaca maupun yang belum dibaca).
      * Query params opsional:
-     *   - unread_only=true   → hanya yang belum dibaca
-     *   - per_page=10        → default 10 (maks 50)
-     *   - type=transaksi     → filter berdasarkan type
+     * - unread_only=true   → hanya yang belum dibaca
+     * - per_page=10        → default 10 (maks 50)
+     * - type=transaksi     → filter berdasarkan type
      */
     public function index(Request $request): JsonResponse
     {
@@ -26,7 +26,8 @@ class MobileNotificationController extends Controller
             ->orderBy('created_at', 'desc');
 
         if ($request->boolean('unread_only')) {
-            $query->where('is_read', false);
+            // Menggunakan kolom enum status agar lebih akurat
+            $query->where('status', 'unread');
         }
 
         if ($request->filled('type')) {
@@ -37,7 +38,7 @@ class MobileNotificationController extends Controller
         $notifications = $query->take($perPage)->get();
 
         $unreadCount = Notification::where('user_id', $userId)
-            ->where('is_read', false)
+            ->where('status', 'unread')
             ->count();
 
         return response()->json([
@@ -54,7 +55,7 @@ class MobileNotificationController extends Controller
     public function unreadCount(): JsonResponse
     {
         $unreadCount = Notification::where('user_id', auth()->id())
-            ->where('is_read', false)
+            ->where('status', 'unread')
             ->count();
 
         return response()->json([
@@ -79,12 +80,17 @@ class MobileNotificationController extends Controller
             ], 404);
         }
 
-        if (!$notif->is_read) {
-            $notif->update(['is_read' => true, 'read_at' => now()]);
+        // Sinkronisasi kolom is_read dan status
+        if ($notif->status === 'unread' || !$notif->is_read) {
+            $notif->update([
+                'is_read' => true,
+                'status'  => 'read',
+                'read_at' => now()
+            ]);
         }
 
         $unreadCount = Notification::where('user_id', $userId)
-            ->where('is_read', false)
+            ->where('status', 'unread')
             ->count();
 
         return response()->json([
@@ -101,9 +107,14 @@ class MobileNotificationController extends Controller
     {
         $userId = auth()->id();
 
+        // Sinkronisasi massal untuk is_read dan status
         Notification::where('user_id', $userId)
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
+            ->where('status', 'unread')
+            ->update([
+                'is_read' => true,
+                'status'  => 'read',
+                'read_at' => now()
+            ]);
 
         return response()->json([
             'success'      => true,
@@ -130,7 +141,7 @@ class MobileNotificationController extends Controller
         $notif->delete();
 
         $unreadCount = Notification::where('user_id', $userId)
-            ->where('is_read', false)
+            ->where('status', 'unread')
             ->count();
 
         return response()->json([
