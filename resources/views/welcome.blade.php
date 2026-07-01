@@ -355,6 +355,8 @@
         .footer-newsletter-form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .footer-newsletter-form input { flex: 1 1 180px; }
         .footer-newsletter-form button { flex: 0 0 auto; }
+        .newsletter-feedback { font-size: 0.85rem; margin-top: 0.6rem; min-height: 1.2em; }
+        .newsletter-feedback.success { color: #34d399; font-weight: 600; }
 
         /* ===== BACK TO TOP ===== */
         .back-to-top {
@@ -388,6 +390,13 @@
             .hero-buttons a { width: 100%; }
             .hero-stats { gap: 2rem !important; }
             .back-to-top { left: 20px; bottom: 20px; width: 44px; height: 44px; }
+        }
+
+        @media (max-width: 380px) {
+            .hero-title { letter-spacing: -0.5px; }
+            .navbar-brand-custom { font-size: 1.05rem; }
+            .brand-logo { width: 36px; height: 36px; }
+            .hero-image-main img { height: 200px; }
         }
 
         /* ===== AI CHATBOT WIDGET ===== */
@@ -555,7 +564,7 @@
                 <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1200" data-aos-delay="200">
                     <div class="hero-visual">
                         <div class="hero-image-main">
-                            <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop" alt="Ilustrasi kegiatan daur ulang dan pemilahan sampah">
+                            <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop" alt="Ilustrasi kegiatan daur ulang dan pemilahan sampah" fetchpriority="high">
                         </div>
                         <div class="floating-card glass-card floating-card-1">
                             <div class="icon-box-primary">
@@ -653,7 +662,11 @@
                     </div>
                     @endforeach
                 @else
-                    <div class="col-12 text-center text-white-50">Data harga belum tersedia.</div>
+                    <div class="col-12 text-center text-white-50 py-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h4"/></svg>
+                        <p class="mb-0 fw-semibold">Daftar harga sedang diperbarui.</p>
+                        <p class="mb-0 small">Silakan cek kembali beberapa saat lagi.</p>
+                    </div>
                 @endif
             </div>
         </div>
@@ -753,7 +766,11 @@
                     </div>
                     @endforeach
                 @else
-                    <div class="col-12 text-center text-muted">Belum ada artikel yang dipublikasikan.</div>
+                    <div class="col-12 text-center text-muted py-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <p class="mb-0 fw-semibold">Belum ada artikel yang dipublikasikan.</p>
+                        <p class="mb-0 small">Nantikan konten edukasi terbaru dari kami di sini.</p>
+                    </div>
                 @endif
             </div>
         </div>
@@ -893,11 +910,12 @@
                 <div class="col-lg-4">
                     <h4 class="footer-title fs-6">Berlangganan Info</h4>
                     <p class="footer-desc mb-3">Dapatkan info kenaikan harga sampah dan edukasi terbaru.</p>
-                    <form class="footer-newsletter-form" onsubmit="return false;">
+                    <form class="footer-newsletter-form" id="newsletterForm">
                         <label for="newsletter-email" class="visually-hidden">Alamat email</label>
                         <input type="email" id="newsletter-email" class="form-control bg-dark border-secondary text-white shadow-none" placeholder="Alamat email Anda" required style="border-radius: 50rem; padding: 0.75rem 1.2rem;">
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Kirim</button>
                     </form>
+                    <p class="newsletter-feedback" id="newsletterFeedback" role="status" aria-live="polite"></p>
                 </div>
             </div>
             <div class="footer-bottom text-center pt-4 border-top border-secondary border-opacity-25">
@@ -911,7 +929,7 @@
     </button>
 
     <div class="chatbot-container">
-        <div class="chatbot-tooltip" onclick="document.body.classList.add('show-chatbot'); initChat();">
+        <div class="chatbot-tooltip" onclick="document.querySelector('.chatbot-toggler').click();">
             Ada pertanyaan? Nura siap bantu! 👋
         </div>
         <button class="chatbot-toggler" aria-label="Buka chat dengan Nura AI Asisten" aria-expanded="false">
@@ -920,7 +938,7 @@
         </button>
     </div>
 
-    <div class="chatbot-window" role="dialog" aria-label="Jendela chat Nura AI Asisten">
+    <div class="chatbot-window" role="dialog" aria-label="Jendela chat Nura AI Asisten" aria-modal="false" inert>
         <div class="chat-header">
             <img src="{{ asset('image/nura.png') }}" onerror="this.src='https://ui-avatars.com/api/?name=Nura&background=10b981&color=fff'" alt="Avatar Nura AI">
             <div>
@@ -992,15 +1010,20 @@
         });
 
         document.querySelectorAll('.counter').forEach(counter => {
+            counter.dataset.raw = '0';
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const updateCount = () => {
                 const target = +counter.getAttribute('data-target');
-                const count = +counter.innerText;
+                const count = +counter.dataset.raw;
                 const inc = target / 40;
-                if(count < target && target > 0) {
-                    counter.innerText = Math.ceil(count + inc);
+                if (count < target && target > 0 && !reduceMotion) {
+                    const next = Math.ceil(count + inc);
+                    counter.dataset.raw = String(next);
+                    counter.innerText = next.toLocaleString('id-ID');
                     setTimeout(updateCount, 40);
                 } else {
-                    counter.innerText = target;
+                    counter.dataset.raw = String(target);
+                    counter.innerText = target.toLocaleString('id-ID');
                 }
             };
             let observer = new IntersectionObserver(e => { if(e[0].isIntersecting){ updateCount(); observer.disconnect(); } }, { threshold: 0.5 });
@@ -1037,19 +1060,42 @@
             chatBody.scrollTop = 0;
         };
 
+        const closeChatbot = () => {
+            document.body.classList.remove("show-chatbot");
+            chatbotToggler.setAttribute('aria-expanded', 'false');
+            chatbotWindow.setAttribute('inert', '');
+            chatbotToggler.focus({ preventScroll: true });
+            setTimeout(initChat, 400);
+        };
+
+        const openChatbot = () => {
+            document.body.classList.add("show-chatbot");
+            chatbotToggler.setAttribute('aria-expanded', 'true');
+            chatbotWindow.removeAttribute('inert');
+            if (document.querySelectorAll('.message').length === 0) initChat();
+            setTimeout(() => chatInput && chatInput.focus({ preventScroll: true }), 350);
+        };
+
         chatbotToggler.addEventListener("click", () => {
             const isShowing = document.body.classList.contains("show-chatbot");
             if (isShowing) {
-                document.body.classList.remove("show-chatbot");
-                chatbotToggler.setAttribute('aria-expanded', 'false');
-                setTimeout(initChat, 400);
+                closeChatbot();
             } else {
-                document.body.classList.add("show-chatbot");
-                chatbotToggler.setAttribute('aria-expanded', 'true');
-                if (document.querySelectorAll('.message').length === 0) initChat();
-                setTimeout(() => chatInput && chatInput.focus({ preventScroll: true }), 350);
+                openChatbot();
             }
         });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('show-chatbot')) {
+                closeChatbot();
+            }
+        });
+
+        /* Hentikan animasi tooltip setelah beberapa saat agar tidak mengganggu pembaca */
+        const chatbotTooltipEl = document.querySelector('.chatbot-tooltip');
+        if (chatbotTooltipEl) {
+            setTimeout(() => { chatbotTooltipEl.style.animation = 'none'; }, 12000);
+        }
 
         const botDatabase = {
             salam: ["halo", "hai", "hi", "pagi", "siang", "sore", "malam", "assalamualaikum", "nura", "ping"],
@@ -1141,6 +1187,24 @@
         chatInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") handleChat();
         });
+
+        /* Newsletter: beri feedback jujur, belum terhubung ke backend */
+        const newsletterForm = document.getElementById('newsletterForm');
+        const newsletterFeedback = document.getElementById('newsletterFeedback');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const emailInput = document.getElementById('newsletter-email');
+                if (!emailInput.checkValidity()) {
+                    newsletterFeedback.textContent = 'Mohon isi alamat email yang valid.';
+                    newsletterFeedback.classList.remove('success');
+                    return;
+                }
+                newsletterFeedback.textContent = 'Terima kasih! Fitur berlangganan info akan segera hadir.';
+                newsletterFeedback.classList.add('success');
+                newsletterForm.reset();
+            });
+        }
     </script>
 </body>
 </html>
