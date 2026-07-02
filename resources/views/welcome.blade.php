@@ -184,15 +184,15 @@
 
         .hero-desc {
             font-size: clamp(1rem, 2.2vw, 1.1rem); color: var(--slate);
-            line-height: 1.7; margin-bottom: 2.5rem; max-width: 500px;
+            line-height: 1.75; margin-bottom: 2rem; max-width: 560px;
             font-weight: 500;
         }
         .btn-hero-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white !important; border-radius: 50rem; padding: 1.05rem 2.2rem; font-weight: 700; font-size: 1.05rem;
+            color: white !important; border-radius: 50rem; padding: 1rem 1.8rem; font-weight: 700; font-size: 1rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent;
-            min-height: 52px;
+            min-height: 50px;
         }
         .btn-hero-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4); border-color: rgba(255,255,255,0.3); }
 
@@ -260,6 +260,47 @@
         .section-title {
             font-weight: 900; color: var(--dark); font-size: clamp(1.7rem, 4.5vw, 2.8rem);
             letter-spacing: -1px; line-height: 1.25; margin-bottom: 1rem;
+        }
+        .section-desc {
+            font-size: clamp(1rem, 1.1vw, 1.05rem);
+            color: var(--slate);
+            line-height: 1.75;
+            margin: 0 auto;
+            max-width: 720px;
+        }
+        section { scroll-margin-top: 110px; }
+        .hero-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.75rem;
+            max-width: 760px;
+        }
+        .hero-highlights .highlight-card {
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 18px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .hero-highlights .highlight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 35px rgba(16,185,129,0.12);
+            border-color: rgba(16,185,129,0.35);
+        }
+        .highlight-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(16,185,129,0.1);
+            color: var(--primary-dark);
+            flex-shrink: 0;
         }
 
         /* ===== CARA KERJA ===== */
@@ -389,6 +430,7 @@
             .hero-section { padding: 120px 0 70px; text-align: center; min-height: auto; }
             .hero-buttons { justify-content: center; }
             .hero-buttons a { flex: 1 1 auto; }
+            .hero-highlights { grid-template-columns: 1fr; }
             .hero-stats { justify-content: center; }
             .hero-image-main { transform: none; margin-top: 2.5rem; }
             .hero-image-main img { height: 340px; }
@@ -553,6 +595,30 @@
                         <a href="#cara-kerja" class="btn-hero-secondary">Pelajari Caranya</a>
                     </div>
 
+                    <div class="hero-highlights mb-4">
+                        <div class="highlight-card">
+                            <span class="highlight-icon">💚</span>
+                            <div>
+                                <div class="fw-bold">Menabung dari Sampah</div>
+                                <p class="text-muted small mb-0">Dapatkan saldo setiap kali setor sampah bersih dan terpilah.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-card">
+                            <span class="highlight-icon">🔄</span>
+                            <div>
+                                <div class="fw-bold">Transparan & Aman</div>
+                                <p class="text-muted small mb-0">Riwayat saldo dan harga bisa dicek langsung di aplikasi.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-card">
+                            <span class="highlight-icon">📍</span>
+                            <div>
+                                <div class="fw-bold">Akses Mudah</div>
+                                <p class="text-muted small mb-0">Cek lokasi dan jadwal operasional sebelum datang.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-4 mb-lg-5" style="max-width: 420px; margin-left: auto; margin-right: auto;">
                         <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn-hero-dark w-100">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -569,12 +635,12 @@
                         </a>
                     </div>
 
-                    <div class="hero-stats d-flex gap-5 justify-content-center justify-content-lg-start flex-wrap">
-                        <div>
+                    <div class="hero-stats d-flex gap-4 justify-content-center justify-content-lg-start flex-wrap">
+                        <div class="text-center text-lg-start">
                             <div class="hero-stat-num"><span class="counter" data-target="{{ $totalNasabah ?? 0 }}">0</span>+</div>
                             <div class="hero-stat-label">Nasabah Aktif</div>
                         </div>
-                        <div>
+                        <div class="text-center text-lg-start">
                             <div class="hero-stat-num"><span class="counter" data-target="{{ $totalSampah ?? 0 }}">0</span><span class="fs-5 ms-1">kg</span></div>
                             <div class="hero-stat-label">Sampah Dikelola</div>
                         </div>
