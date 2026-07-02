@@ -152,6 +152,9 @@
             padding: 150px 0 90px; position: relative;
             min-height: 100vh; display: flex; align-items: center;
         }
+        @supports (min-height: 100dvh) {
+            .hero-section { min-height: 100dvh; }
+        }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 10px;
             padding: 8px 20px; border-radius: 50rem;
@@ -217,6 +220,18 @@
         .hero-stat-num { font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 900; color: var(--dark); letter-spacing: -1px; line-height: 1.2; }
         .hero-stat-label { font-weight: 600; color: var(--slate); font-size: 0.9rem; }
         .hero-stats { row-gap: 1.25rem; }
+
+        @media (max-width: 575px) {
+            .hero-stats {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 0 !important;
+                width: 100%; max-width: 360px; margin: 0 auto;
+            }
+            .hero-stats > div {
+                border-left: 1px solid rgba(15,23,42,0.08);
+                padding-left: 1rem; text-align: left;
+            }
+            .hero-stats > div:first-child { border-left: none; padding-left: 0; }
+        }
 
         .hero-visual { position: relative; margin-top: 2rem; }
         .hero-image-main {
@@ -371,7 +386,7 @@
         .back-to-top:hover { background: var(--primary-dark); }
 
         @media (max-width: 991px) {
-            .hero-section { padding: 120px 0 70px; text-align: center; }
+            .hero-section { padding: 120px 0 70px; text-align: center; min-height: auto; }
             .hero-buttons { justify-content: center; }
             .hero-buttons a { flex: 1 1 auto; }
             .hero-stats { justify-content: center; }
@@ -397,6 +412,10 @@
             .navbar-brand-custom { font-size: 1.05rem; }
             .brand-logo { width: 36px; height: 36px; }
             .hero-image-main img { height: 200px; }
+        }
+
+        @media (max-width: 340px) {
+            .navbar-brand-custom span { display: none; }
         }
 
         /* ===== AI CHATBOT WIDGET ===== */
@@ -490,7 +509,7 @@
         <div class="container">
             <a class="navbar-brand-custom d-flex align-items-center gap-3" href="#beranda">
                 <img src="{{ asset('image/BankSampahlogo.png') }}" alt="Logo Bank Sampah Subang" class="brand-logo">
-                Bank Sampah Subang
+                <span>Bank Sampah Subang</span>
             </a>
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Buka menu navigasi">
                 <span class="navbar-toggler-icon"></span>
@@ -517,7 +536,7 @@
     <section id="beranda" class="hero-section">
         <div class="container">
             <div class="row align-items-center g-5">
-                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+                <div class="col-12 col-lg-6" data-aos="fade-right" data-aos-duration="1000">
                     <div class="hero-badge">
                         <span class="pulse-dot"></span> Ekosistem Digital Terpadu
                     </div>
@@ -534,7 +553,7 @@
                         <a href="#cara-kerja" class="btn-hero-secondary">Pelajari Caranya</a>
                     </div>
 
-                    <div class="mb-5" style="max-width: 420px; margin-left: auto; margin-right: auto;">
+                    <div class="mb-4 mb-lg-5" style="max-width: 420px; margin-left: auto; margin-right: auto;">
                         <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn-hero-dark w-100">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -561,7 +580,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6" data-aos="zoom-in" data-aos-duration="1200" data-aos-delay="200">
+                <div class="col-12 col-lg-6" data-aos="zoom-in" data-aos-duration="1200" data-aos-delay="200">
                     <div class="hero-visual">
                         <div class="hero-image-main">
                             <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop" alt="Ilustrasi kegiatan daur ulang dan pemilahan sampah" fetchpriority="high">
@@ -599,7 +618,7 @@
             <div class="timeline-wrapper">
                 <div class="timeline-line"></div>
                 <div class="row g-4">
-                    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
                         <div class="step-card text-center">
                             <div class="step-icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -608,7 +627,7 @@
                             <p class="text-muted lh-base font-medium mb-0">Daftarkan diri Anda sebagai nasabah Bank Sampah.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
                         <div class="step-card text-center">
                             <div class="step-icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
@@ -617,7 +636,7 @@
                             <p class="text-muted lh-base font-medium mb-0">Pisahkan sampah organik dan anorganik dari rumah.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
                         <div class="step-card text-center">
                             <div class="step-icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
@@ -626,7 +645,7 @@
                             <p class="text-muted lh-base font-medium mb-0">Bawa ke titik kumpul kami untuk ditimbang petugas.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
                         <div class="step-card text-center">
                             <div class="step-icon-wrap">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -652,7 +671,7 @@
             <div class="row g-4 justify-content-center">
                 @if(isset($jenisSampah) && count($jenisSampah) > 0)
                     @foreach($jenisSampah as $index => $sampah)
-                    <div class="col-sm-6 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ $index * 100 }}">
+                    <div class="col-12 col-sm-6 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ $index * 100 }}">
                         <div class="harga-card">
                             <div class="harga-kategori">{{ $sampah->kategori ?? 'Umum' }}</div>
                             <div class="harga-nama">{{ $sampah->nama }}</div>
@@ -687,7 +706,7 @@
             </div>
             <div class="row g-4">
                 @foreach($stokTersedia as $stok)
-                <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                <div class="col-12 col-sm-6 col-lg-4" data-aos="fade-up">
                     <a href="{{ route('publik.stok.detail', $stok->slug ?? '') ?? '#' }}" class="text-decoration-none">
                         <div class="stok-card">
                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -744,7 +763,7 @@
             <div class="row g-4">
                 @if(isset($artikels) && count($artikels) > 0)
                     @foreach($artikels as $index => $artikel)
-                    <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $index * 150 }}">
+                    <div class="col-12 col-sm-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ $index * 150 }}">
                         <a href="{{ route('publik.artikel.baca', $artikel->slug ?? '') ?? '#' }}" class="artikel-card">
                             <div class="artikel-img-wrapper">
                                 <img src="{{ !empty($artikel->gambar) ? asset('storage/' . $artikel->gambar) : 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=2070&auto=format&fit=crop' }}"
@@ -783,7 +802,7 @@
                 <p class="section-desc mx-auto text-slate fw-medium">Pengalaman mereka setelah bergabung menjadi bagian dari perubahan.</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="testi-card h-100 d-flex flex-column justify-content-between">
                         <p class="testi-quote">"Sangat membantu! Selain lingkungan rumah jadi bersih dari botol plastik, saldonya lumayan buat nambah uang belanja bulanan."</p>
                         <div class="testi-user">
@@ -795,7 +814,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="testi-card h-100 d-flex flex-column justify-content-between">
                         <p class="testi-quote">"Sistemnya sangat transparan. Saya bisa ngecek saldo dan history setoran langsung dari HP. Penarikan dananya juga cepat diproses."</p>
                         <div class="testi-user">
@@ -807,7 +826,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="300">
                     <div class="testi-card h-100 d-flex flex-column justify-content-between">
                         <p class="testi-quote">"Edukasi dari Bank Sampah bikin sadar kalau kardus dan kertas koran yang biasa dibakar ternyata punya nilai ekonomi tinggi."</p>
                         <div class="testi-user">
@@ -826,7 +845,7 @@
     <section id="lokasi" class="lokasi-section">
         <div class="container">
             <div class="row align-items-center g-5">
-                <div class="col-lg-5" data-aos="fade-right">
+                <div class="col-12 col-lg-5" data-aos="fade-right">
                     <div class="section-label">Kunjungi Kami</div>
                     <h2 class="section-title">Kantor Pelayanan Bank Sampah</h2>
                     <p class="section-desc mb-5 text-slate fw-medium">Tim kami siap melayani penimbangan sampah dan pencairan dana Anda setiap hari kerja.</p>
@@ -850,7 +869,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-7" data-aos="fade-left">
+                <div class="col-12 col-lg-7" data-aos="fade-left">
                     <div class="map-wrapper">
                         <iframe src="https://maps.google.com/maps?q=Kabupaten%20Subang,%20Jawa%20Barat&t=&z=11&ie=UTF8&iwloc=&output=embed" title="Peta lokasi Bank Sampah Subang" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div>
@@ -882,7 +901,7 @@
     <footer class="footer">
         <div class="container">
             <div class="row g-5 mb-5">
-                <div class="col-lg-4">
+                <div class="col-12 col-lg-4">
                     <h3 class="fw-bold d-flex align-items-center gap-3 mb-4 text-white fs-5">
                         <img src="{{ asset('image/BankSampahlogo.png') }}" alt="Logo Bank Sampah Subang" style="width:40px; border-radius:10px;">
                         Bank Sampah Subang
@@ -907,7 +926,7 @@
                     <a href="#" class="footer-link">Bantuan (FAQ)</a>
                     <a href="{{ route('admin.login') ?? '#' }}" class="footer-link">Masuk Admin</a>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-12 col-lg-4">
                     <h4 class="footer-title fs-6">Berlangganan Info</h4>
                     <p class="footer-desc mb-3">Dapatkan info kenaikan harga sampah dan edukasi terbaru.</p>
                     <form class="footer-newsletter-form" id="newsletterForm">
