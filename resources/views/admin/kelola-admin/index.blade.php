@@ -274,29 +274,30 @@
                     </td>
                     <td class="text-center">
                         <div class="dropdown">
-                            <button type="button" class="btn btn-light btn-sm rounded-pill px-3 fw-medium dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Opsi
+                            <button type="button" class="btn btn-light btn-sm rounded-pill px-3 fw-semibold border dropdown-toggle d-inline-flex align-items-center gap-1 shadow-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-500"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                <span>Aksi</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 12px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 180px;">
                                 <li>
-                                    <a href="{{ route('admin.kelola-admin.view', $a->id) }}" class="dropdown-item py-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-primary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0 -20"/></svg>
+                                    <a href="{{ route('admin.kelola-admin.view', $a->id) }}" class="dropdown-item py-2 d-flex align-items-center text-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                         Lihat Detail
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.kelola-admin.edit', $a->id) }}" class="dropdown-item py-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-warning" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.196 2.196 0 0 0 -1.606 -3.175a2.196 2.196 0 0 0 -2.606 1.297l-7.173 14.293l-2.4.4l1.6 -2.4l7.173 -14.293z"/></svg>
+                                    <a href="{{ route('admin.kelola-admin.edit', $a->id) }}" class="dropdown-item py-2 d-flex align-items-center text-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-amber" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                         Edit Data
                                     </a>
                                 </li>
                                 @if(auth()->id() !== $a->id)
-                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><hr class="dropdown-divider my-1 border-slate-100"></li>
                                 <li>
                                     <form method="POST" action="{{ route('admin.kelola-admin.reset-password', $a->id) }}" class="d-inline w-100">
                                         @csrf
-                                        <button type="submit" class="dropdown-item py-2" onclick="return confirm('Reset password {{ $a->name }} ke admin123?')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-secondary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1 -15.357 -2m15.357 2H15"/></svg>
+                                        <button type="submit" class="dropdown-item py-2 d-flex align-items-center text-dark" onclick="return confirm('Reset password {{ $a->name }} ke admin123?')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-slate-500" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                             Reset Sandi
                                         </button>
                                     </form>
@@ -304,12 +305,12 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.kelola-admin.toggle-status', $a->id) }}" class="d-inline w-100">
                                         @csrf
-                                        <button type="submit" class="dropdown-item py-2 {{ $a->is_active ? 'text-danger' : 'text-success' }}" onclick="return confirm('{{ $a->is_active ? 'Nonaktifkan' : 'Aktifkan' }} jenis admin ini?')">
+                                        <button type="submit" class="dropdown-item py-2 d-flex align-items-center {{ $a->is_active ? 'text-rose' : 'text-emerald' }}" onclick="return confirm('{{ $a->is_active ? 'Nonaktifkan' : 'Aktifkan' }} jenis admin ini?')">
                                             @if($a->is_active)
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
                                                 Nonaktifkan Akses
                                             @else
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
                                                 Aktifkan Akses
                                             @endif
                                         </button>
@@ -318,8 +319,8 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.kelola-admin.destroy', $a->id) }}" class="d-inline w-100">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="dropdown-item py-2 text-danger" onclick="return confirm('Yakin hapus permanen admin {{ $a->name }}?')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg>
+                                        <button type="submit" class="dropdown-item py-2 d-flex align-items-center text-rose fw-semibold" onclick="return confirm('Yakin hapus permanen admin {{ $a->name }}?')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                             Hapus Permanen
                                         </button>
                                     </form>

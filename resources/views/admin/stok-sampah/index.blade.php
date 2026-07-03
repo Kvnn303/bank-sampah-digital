@@ -208,20 +208,27 @@
 
                     <td class="pe-4 text-center">
                         <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill fw-semibold border" type="button" data-bs-toggle="dropdown"><x-icon name="settings" size="16" /></button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 160px;">
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                                <x-icon name="settings" class="text-slate-500" size="16" />
+                                <span>Aksi</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 180px;">
                                 <li>
-                                    <a href="{{ route('admin.stok-sampah.show', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark"><x-icon name="eye" class="text-slate-400 me-2" size="18" />Detail</a>
+                                    <a href="{{ route('admin.stok-sampah.show', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <x-icon name="eye" class="text-blue me-2" size="18" />Lihat Detail
+                                    </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.stok-sampah.edit', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark"><x-icon name="edit" class="text-slate-400 me-2" size="18" />Edit</a>
+                                    <a href="{{ route('admin.stok-sampah.edit', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <x-icon name="edit" class="text-amber me-2" size="18" />Edit Data
+                                    </a>
                                 </li>
 
                                 {{-- Toggle Publish --}}
                                 <li>
                                     <form method="POST" action="{{ route('admin.stok-sampah.toggle-publish', $stok->id) }}" class="d-inline w-100">
                                         @csrf
-                                        <button type="submit" class="dropdown-item d-flex align-items-center {{ $stok->is_published ? 'text-rose' : 'text-emerald' }} w-100">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center py-2 {{ $stok->is_published ? 'text-rose' : 'text-emerald' }} w-100">
                                             @if($stok->is_published)
                                                 <x-icon name="x" class="me-2" size="18" />Nonaktifkan Publish
                                             @else
@@ -235,7 +242,7 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.stok-sampah.toggle-press', $stok->id) }}" class="d-inline w-100">
                                         @csrf
-                                        <button type="submit" class="dropdown-item d-flex align-items-center {{ $stok->is_pres ? 'text-purple' : 'text-blue' }} w-100">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center py-2 {{ $stok->is_pres ? 'text-purple' : 'text-blue' }} w-100">
                                             @if($stok->is_pres)
                                                 <x-icon name="layers" class="me-2" size="18" />Batalkan Press
                                             @else
@@ -247,7 +254,7 @@
 
                                 @if($stok->stok_tersisa_kg > 0)
                                 <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center text-emerald fw-semibold" onclick="showJualModal({{ $stok->id }}, '{{ addslashes($stok->jenisSampah->nama ?? '') }}', {{ $stok->stok_tersisa_kg }}, {{ $stok->harga_jual_per_kg }})">
+                                    <button type="button" class="dropdown-item d-flex align-items-center py-2 text-emerald fw-semibold" onclick="showJualModal({{ $stok->id }}, '{{ addslashes($stok->jenisSampah->nama ?? '') }}', {{ $stok->stok_tersisa_kg }}, {{ $stok->harga_jual_per_kg }})">
                                         <x-icon name="currency" class="text-emerald me-2" size="18" />Catat Penjualan
                                     </button>
                                 </li>
@@ -258,8 +265,8 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.stok-sampah.destroy', $stok->id) }}" class="d-inline w-100">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold w-100" onclick="return confirm('Yakin hapus stok ini?')">
-                                            <x-icon name="trash" class="me-2" size="18" />Hapus
+                                        <button type="submit" class="dropdown-item d-flex align-items-center py-2 text-rose fw-semibold w-100" onclick="return confirm('Yakin hapus stok ini?')">
+                                            <x-icon name="trash" class="me-2" size="18" />Hapus Permanen
                                         </button>
                                     </form>
                                 </li>

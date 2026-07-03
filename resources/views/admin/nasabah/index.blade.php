@@ -330,21 +330,22 @@
                     <!-- Kolom Aksi (Dropdown Diperbaiki) -->
                     <td class="pe-4 text-center">
                         <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill fw-semibold border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Aksi
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-slate-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                <span>Aksi</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 190px;">
                                 <!-- Icon Mata -->
                                 <li>
-                                    <a href="{{ route('admin.nasabah.show', $n->id) }}" class="dropdown-item d-flex align-items-center text-dark">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-slate-400"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <a href="{{ route('admin.nasabah.show', $n->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-blue"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                         Detail Profil
                                     </a>
                                 </li>
                                 <!-- Icon Pensil -->
                                 <li>
-                                    <a href="{{ route('admin.nasabah.edit', $n->id) }}" class="dropdown-item d-flex align-items-center text-dark">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-slate-400"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                    <a href="{{ route('admin.nasabah.edit', $n->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-amber"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                         Edit Data
                                     </a>
                                 </li>
@@ -355,7 +356,7 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.nasabah.verifikasi', $n->id) }}">
                                         @csrf @method('PUT')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-emerald" onclick="return confirm('Verifikasi nasabah ini?')">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center text-emerald fw-semibold py-2" onclick="return confirm('Verifikasi nasabah ini?')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                                             Verifikasi Akun
                                         </button>
@@ -367,7 +368,7 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.nasabah.reset-password', $n->id) }}">
                                         @csrf
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-dark" onclick="return confirm('Reset password nasabah ini?')">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center text-dark py-2" onclick="return confirm('Reset password nasabah ini?')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-amber"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                                             Reset Password
                                         </button>
@@ -376,8 +377,8 @@
 
                                 <!-- Salin Password Default (Copy) -->
                                 <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center text-dark" onclick="copyPw('pw-{{ $n->id }}')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-blue-modern"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                    <button type="button" class="dropdown-item d-flex align-items-center text-dark py-2" onclick="copyPw('pw-{{ $n->id }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 text-blue"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                         Salin Pass Default
                                     </button>
                                     <input type="hidden" id="pw-{{ $n->id }}" value="{{ $n->no_telepon ?? $n->no_ktp ?? 'banksampah123' }}">
@@ -390,7 +391,7 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.nasabah.nonaktifkan', $n->id) }}">
                                         @csrf @method('PUT')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold" onclick="return confirm('Nonaktifkan nasabah ini?')">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold py-2" onclick="return confirm('Nonaktifkan nasabah ini?')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
                                             Nonaktifkan
                                         </button>
@@ -400,7 +401,7 @@
                                 <li>
                                     <form method="POST" action="{{ route('admin.nasabah.aktifkan', $n->id) }}">
                                         @csrf @method('PUT')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-emerald fw-semibold" onclick="return confirm('Aktifkan kembali nasabah ini?')">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center text-emerald fw-semibold py-2" onclick="return confirm('Aktifkan kembali nasabah ini?')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
                                             Aktifkan Kembali
                                         </button>

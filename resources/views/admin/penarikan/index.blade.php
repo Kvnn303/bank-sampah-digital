@@ -283,13 +283,14 @@
                     </td>
                     <td class="pe-4 text-center">
                         <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill fw-semibold border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Aksi
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-slate-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                <span>Aksi</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 190px;">
                                 <li>
-                                    <a href="{{ route('admin.penarikan.show', $p->id) }}" class="dropdown-item d-flex align-items-center text-dark">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3" /><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/></svg>
+                                    <a href="{{ route('admin.penarikan.show', $p->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="3" /><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/></svg>
                                         Lihat Detail
                                     </a>
                                 </li>
@@ -299,14 +300,14 @@
                                     <li>
                                         <form method="POST" action="{{ route('admin.penarikan.setujui', $p->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menyetujui penarikan ini?')">
                                             @csrf @method('PUT')
-                                            <button type="submit" class="dropdown-item d-flex align-items-center text-emerald fw-semibold">
+                                            <button type="submit" class="dropdown-item d-flex align-items-center text-emerald fw-semibold py-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
                                                 Setujui Penarikan
                                             </button>
                                         </form>
                                     </li>
                                     <li>
-                                        <button type="button" class="dropdown-item d-flex align-items-center text-rose fw-semibold border-0 bg-transparent w-100 text-start" data-bs-toggle="modal" data-bs-target="#modalTolak" onclick="setTolakAction({{ $p->id }})">
+                                        <button type="button" class="dropdown-item d-flex align-items-center text-rose fw-semibold border-0 bg-transparent w-100 text-start py-2" data-bs-toggle="modal" data-bs-target="#modalTolak" onclick="setTolakAction({{ $p->id }})">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                                             Tolak Pengajuan
                                         </button>
@@ -316,7 +317,7 @@
                                 @if($p->status == 'diproses')
                                     <li><hr class="dropdown-divider my-1 border-slate-100"></li>
                                     <li>
-                                        <button type="button" class="dropdown-item d-flex align-items-center text-blue-modern fw-semibold border-0 bg-transparent w-100 text-start" data-bs-toggle="modal" data-bs-target="#modalSelesai" onclick="setSelesaiAction({{ $p->id }})">
+                                        <button type="button" class="dropdown-item d-flex align-items-center text-blue-modern fw-semibold border-0 bg-transparent w-100 text-start py-2" data-bs-toggle="modal" data-bs-target="#modalSelesai" onclick="setSelesaiAction({{ $p->id }})">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m6 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0" /></svg>
                                             Tandai Selesai
                                         </button>

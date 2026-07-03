@@ -60,13 +60,13 @@
 
         /* ===== UTILITIES & GLASSMORPHISM ===== */
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 1.25rem 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
         .icon-box-primary {
@@ -108,24 +108,24 @@
 
         /* ===== NAVBAR ===== */
         .navbar-custom {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 1rem 0;
             z-index: 1030;
         }
         .navbar-custom.scrolled {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            padding: 0.65rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
         .navbar-brand-custom {
             font-weight: 800; font-size: 1.25rem; color: var(--dark) !important;
-            letter-spacing: -0.5px; text-decoration: none;
+            letter-spacing: -0.5px; text-decoration: none; display: flex; align-items: center; gap: 12px;
         }
-        .brand-logo { width: 42px; height: 42px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .brand-logo { width: 42px; height: 42px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex-shrink: 0; }
 
         .nav-link-custom {
             color: var(--slate) !important; font-weight: 600; font-size: 0.95rem;
@@ -135,17 +135,34 @@
         }
         .nav-link-custom:hover, .nav-link-custom.active {
             color: var(--primary-dark) !important;
-            background: rgba(16, 185, 129, 0.08);
+            background: rgba(16, 185, 129, 0.1);
         }
         .btn-masuk {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white !important; border: none; border-radius: 50rem;
             padding: 0.7rem 1.8rem; font-weight: 700; font-size: 0.95rem;
             transition: all 0.3s ease; box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
-            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             min-height: 44px;
         }
-        .btn-masuk:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+        .btn-masuk:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+
+        /* Responsive Mobile Navbar Menu */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(25px);
+                -webkit-backdrop-filter: blur(25px);
+                margin-top: 1rem;
+                padding: 1.5rem;
+                border-radius: 22px;
+                box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+                border: 1px solid rgba(0, 0, 0, 0.06);
+            }
+            .navbar-nav { gap: 0.35rem; margin-bottom: 1.25rem; }
+            .nav-link-custom { justify-content: center; font-size: 1rem; padding: 0.8rem 1rem !important; }
+            .btn-masuk { width: 100%; font-size: 1rem; padding: 0.85rem; }
+        }
 
         /* ===== HERO ===== */
         .hero-section {
@@ -171,7 +188,7 @@
 
         .hero-title {
             font-weight: 900; color: var(--dark);
-            font-size: clamp(2.3rem, 7vw, 4.5rem); line-height: 1.1;
+            font-size: clamp(2.3rem, 6.5vw, 4.4rem); line-height: 1.12;
             letter-spacing: -1.5px; margin-bottom: 1.5rem;
         }
         .hero-title .gradient-text {
@@ -183,8 +200,8 @@
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .hero-desc {
-            font-size: clamp(1rem, 2.2vw, 1.1rem); color: var(--slate);
-            line-height: 1.75; margin-bottom: 2rem; max-width: 560px;
+            font-size: clamp(1rem, 2vw, 1.125rem); color: var(--slate);
+            line-height: 1.75; margin-bottom: 2rem; max-width: 580px;
             font-weight: 500;
         }
         .btn-hero-primary {
@@ -194,50 +211,83 @@
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent;
             min-height: 50px;
         }
-        .btn-hero-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4); border-color: rgba(255,255,255,0.3); }
+        .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 18px 35px rgba(16, 185, 129, 0.4); border-color: rgba(255,255,255,0.3); }
 
         .btn-hero-secondary {
-            background: white; color: var(--dark) !important; border-radius: 50rem; padding: 1.05rem 2.2rem; font-weight: 700;
-            font-size: 1.05rem; transition: all 0.3s; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(0,0,0,0.05);
-            min-height: 52px;
+            background: white; color: var(--dark) !important; border-radius: 50rem; padding: 1rem 2rem; font-weight: 700;
+            font-size: 1rem; transition: all 0.3s; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(0,0,0,0.08);
+            min-height: 50px;
         }
-        .btn-hero-secondary:hover { color: var(--primary-dark) !important; transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: var(--primary-light); }
+        .btn-hero-secondary:hover { color: var(--primary-dark) !important; transform: translateY(-3px); box-shadow: 0 18px 35px rgba(0,0,0,0.1); border-color: var(--primary-light); }
 
-        .hero-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-        .hero-buttons a { flex: 1 1 auto; }
+        .hero-buttons { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+        .hero-buttons a { flex: 0 1 auto; }
 
         /* TOMBOL APK TAMBAHAN */
         .btn-hero-dark {
             background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: white !important; border-radius: 50rem; padding: 1.05rem 2.2rem; font-weight: 700; font-size: 1.05rem;
+            color: white !important; border-radius: 50rem; padding: 1rem 2rem; font-weight: 700; font-size: 1rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
             text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
             min-height: 52px; text-align: center;
         }
-        .btn-hero-dark:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.2); }
+        .btn-hero-dark:hover { transform: translateY(-3px); box-shadow: 0 18px 35px rgba(15, 23, 42, 0.4); border-color: rgba(255,255,255,0.2); }
 
-        .hero-stat-num { font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 900; color: var(--dark); letter-spacing: -1px; line-height: 1.2; }
-        .hero-stat-label { font-weight: 600; color: var(--slate); font-size: 0.9rem; }
-        .hero-stats { row-gap: 1.25rem; }
+        .hero-apk-wrap { max-width: 440px; margin-bottom: 2.25rem; }
 
-        @media (max-width: 575px) {
-            .hero-stats {
-                display: grid; grid-template-columns: 1fr 1fr; gap: 0 !important;
-                width: 100%; max-width: 360px; margin: 0 auto;
-            }
-            .hero-stats > div {
-                border-left: 1px solid rgba(15,23,42,0.08);
-                padding-left: 1rem; text-align: left;
-            }
-            .hero-stats > div:first-child { border-left: none; padding-left: 0; }
+        .hero-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 1rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.75rem;
+            max-width: 650px;
+        }
+        .hero-highlights .highlight-card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .hero-highlights .highlight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16,185,129,0.12);
+            border-color: rgba(16,185,129,0.35);
+        }
+        .highlight-icon {
+            width: 42px; height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(16,185,129,0.1);
+            color: var(--primary-dark);
+            flex-shrink: 0;
+            font-size: 1.2rem;
         }
 
-        .hero-visual { position: relative; margin-top: 2rem; }
+        .hero-stats {
+            display: flex; flex-wrap: wrap; gap: 1.25rem;
+        }
+        .stat-box {
+            background: white; border: 1px solid rgba(15, 23, 42, 0.06);
+            padding: 1rem 1.5rem; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .hero-stat-num { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 900; color: var(--dark); letter-spacing: -1px; line-height: 1.1; }
+        .hero-stat-label { font-weight: 600; color: var(--slate); font-size: 0.85rem; }
+
+        .hero-visual { position: relative; margin-top: 1rem; }
         .hero-image-main {
             border-radius: 28px; overflow: hidden;
             box-shadow: 0 30px 60px rgba(0,0,0,0.15), inset 0 0 0 8px rgba(255,255,255,0.4);
-            transform: perspective(1000px) rotateY(-8deg) rotateX(4deg);
+            transform: perspective(1000px) rotateY(-6deg) rotateX(3deg);
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; z-index: 2;
         }
@@ -245,108 +295,94 @@
         .hero-image-main img { width: 100%; height: 500px; object-fit: cover; display: block; }
 
         .floating-card {
-            position: absolute; display: flex; align-items: center; gap: 15px; z-index: 3;
+            position: absolute; display: flex; align-items: center; gap: 14px; z-index: 3;
             animation: floatCard 6s ease-in-out infinite;
         }
-        .floating-card-1 { bottom: 60px; left: -30px; animation-delay: 0s; }
-        .floating-card-2 { top: 40px; right: -20px; animation-delay: 3s; }
-        @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .floating-card-1 { bottom: 40px; left: -25px; animation-delay: 0s; }
+        .floating-card-2 { top: 30px; right: -15px; animation-delay: 3s; }
+        @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
         /* ===== COMMON ===== */
         .section-label {
-            display: inline-flex; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 2px; margin-bottom: 1rem; color: var(--primary);
+            display: inline-flex; font-size: 0.82rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 2px; margin-bottom: 0.8rem; color: var(--primary);
         }
         .section-title {
-            font-weight: 900; color: var(--dark); font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+            font-weight: 900; color: var(--dark); font-size: clamp(1.7rem, 4.5vw, 2.7rem);
             letter-spacing: -1px; line-height: 1.25; margin-bottom: 1rem;
         }
         .section-desc {
-            font-size: clamp(1rem, 1.1vw, 1.05rem);
+            font-size: clamp(0.98rem, 1.5vw, 1.08rem);
             color: var(--slate);
             line-height: 1.75;
             margin: 0 auto;
-            max-width: 720px;
+            max-width: 700px;
         }
-        section { scroll-margin-top: 110px; }
-        .hero-highlights {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-top: 1.75rem;
-            max-width: 760px;
-        }
-        .hero-highlights .highlight-card {
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(16,185,129,0.15);
-            border-radius: 18px;
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.9rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .hero-highlights .highlight-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 18px 35px rgba(16,185,129,0.12);
-            border-color: rgba(16,185,129,0.35);
-        }
-        .highlight-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            background: rgba(16,185,129,0.1);
-            color: var(--primary-dark);
-            flex-shrink: 0;
-        }
+        section { scroll-margin-top: 100px; }
 
         /* ===== CARA KERJA ===== */
         .cara-kerja-section { padding: clamp(60px, 8vw, 100px) 0; }
-        .timeline-wrapper { position: relative; margin-top: 3rem; }
+        .timeline-wrapper { position: relative; margin-top: 3.5rem; }
         .timeline-line {
-            position: absolute; top: 40px; left: 10%; right: 10%; height: 4px;
-            background: linear-gradient(90deg, rgba(16,185,129,0.15) 50%, transparent 0);
-            background-size: 20px 4px; z-index: 0;
+            position: absolute; top: 45px; left: 12%; right: 12%; height: 4px;
+            background: linear-gradient(90deg, rgba(16,185,129,0.2) 50%, transparent 0);
+            background-size: 18px 4px; z-index: 0;
         }
         @media (max-width: 991px) { .timeline-line { display: none; } }
 
         .step-card {
-            background: white; border-radius: 24px; padding: 2.5rem 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+            background: white; border-radius: 24px; padding: 2.25rem 1.75rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.04);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 1; height: 100%;
         }
-        .step-card:hover, .step-card:focus-within { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(16, 185, 129, 0.08); border-bottom: 4px solid var(--primary); }
+        .step-card:hover, .step-card:focus-within { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(16, 185, 129, 0.08); border-color: rgba(16,185,129,0.3); }
+        .step-badge {
+            position: absolute; top: 16px; right: 20px; font-size: 1.25rem; font-weight: 900;
+            color: rgba(16, 185, 129, 0.2); letter-spacing: -1px; transition: color 0.3s;
+        }
+        .step-card:hover .step-badge { color: var(--primary); }
         .step-icon-wrap {
-            width: 80px; height: 80px; border-radius: 24px; margin: 0 auto 1.5rem;
+            width: 76px; height: 76px; border-radius: 22px; margin: 0 auto 1.3rem;
             background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             display: flex; align-items: center; justify-content: center; position: relative;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .step-card:hover .step-icon-wrap { background: var(--primary); color: white; transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 30px rgba(16,185,129,0.3); }
+        .step-card:hover .step-icon-wrap { background: var(--primary); color: white; transform: scale(1.08) rotate(4deg); box-shadow: 0 15px 30px rgba(16,185,129,0.3); }
         .step-card:hover .step-icon-wrap svg { stroke: white; }
         .step-icon-wrap svg { stroke: var(--primary); transition: 0.4s; }
 
         /* ===== HARGA ===== */
         .harga-section {
-            background: var(--darker); padding: clamp(70px, 10vw, 120px) 0; position: relative; overflow: hidden;
+            background: var(--darker); padding: clamp(70px, 10vw, 110px) 0; position: relative; overflow: hidden;
         }
         .harga-bg-glow {
-            position: absolute; width: 80vw; height: 80vw; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 60%);
+            position: absolute; width: 80vw; height: 80vw; background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 60%);
             top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; pointer-events: none;
+        }
+        .search-price-wrap {
+            max-width: 480px; margin: 0 auto 2.5rem; position: relative; z-index: 2;
+        }
+        .search-price-input {
+            width: 100%; padding: 0.9rem 1.4rem 0.9rem 3.2rem; border-radius: 50rem;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+            color: white; font-size: 0.95rem; outline: none; transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .search-price-input::placeholder { color: rgba(255,255,255,0.5); }
+        .search-price-input:focus { background: rgba(255,255,255,0.14); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(16,185,129,0.2); }
+        .search-price-icon {
+            position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%);
+            color: rgba(255,255,255,0.5); pointer-events: none;
         }
         .harga-card {
             background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.15); border-left: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.02);
-            border-radius: 24px; padding: 2.5rem 2rem; text-align: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 1;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 22px; padding: 2rem 1.5rem; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 1; height: 100%;
         }
-        .harga-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-top-color: var(--primary); }
-        .harga-kategori { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 1rem; }
-        .harga-nama { color: white; font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem; }
-        .harga-nominal { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: white; margin-bottom: 0.2rem; letter-spacing: -1px; }
+        .harga-card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.06); box-shadow: 0 20px 45px rgba(0,0,0,0.5); border-color: var(--primary); }
+        .harga-kategori { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 0.75rem; }
+        .harga-nama { color: white; font-weight: 700; font-size: 1.15rem; margin-bottom: 0.85rem; }
+        .harga-nominal { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; color: white; margin-bottom: 0.15rem; letter-spacing: -0.5px; }
 
         /* ===== STOK TERSEDIA ===== */
         .stok-section { padding: clamp(60px, 8vw, 100px) 0; background: white; }
@@ -362,51 +398,51 @@
             border: 1px solid rgba(0,0,0,0.04); border-radius: 24px; overflow: hidden; background: white; text-decoration: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; height: 100%;
         }
-        .artikel-card:hover, .artikel-card:focus-within { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.08); }
-        .artikel-img-wrapper { height: 220px; position: relative; overflow: hidden; }
+        .artikel-card:hover, .artikel-card:focus-within { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.08); }
+        .artikel-img-wrapper { height: 210px; position: relative; overflow: hidden; }
         .artikel-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .artikel-card:hover .artikel-img { transform: scale(1.08); }
         .artikel-date-badge {
-            position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px);
-            border-radius: 16px; padding: 10px 14px; text-align: center; font-weight: 800; line-height: 1.1; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.96); backdrop-filter: blur(5px);
+            border-radius: 14px; padding: 8px 12px; text-align: center; font-weight: 800; line-height: 1.1; box-shadow: 0 8px 18px rgba(0,0,0,0.1);
         }
-        .artikel-date-badge .day { font-size: 1.3rem; color: var(--dark); display: block; }
-        .artikel-date-badge .month { font-size: 0.75rem; color: var(--primary); text-transform: uppercase; }
-        .artikel-body { padding: 1.75rem; flex-grow: 1; display: flex; flex-direction: column; }
-        .artikel-title { font-weight: 800; color: var(--dark); font-size: 1.2rem; margin-bottom: 1rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s; }
+        .artikel-date-badge .day { font-size: 1.2rem; color: var(--dark); display: block; }
+        .artikel-date-badge .month { font-size: 0.72rem; color: var(--primary); text-transform: uppercase; }
+        .artikel-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .artikel-title { font-weight: 800; color: var(--dark); font-size: 1.15rem; margin-bottom: 1rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s; }
         .artikel-card:hover .artikel-title { color: var(--primary-dark); }
-        .artikel-link { margin-top: auto; color: var(--primary); font-weight: 700; display: inline-flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .artikel-link { margin-top: auto; color: var(--primary); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: 0.3s; }
         .artikel-card:hover .artikel-link { gap: 10px; }
 
         /* ===== TESTIMONI ===== */
         .testi-section { background: white; padding: clamp(60px, 8vw, 100px) 0; }
-        .testi-card { background: var(--surface); border-radius: 24px; padding: 2.25rem; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; z-index: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.02);}
-        .testi-card::before { content: '"'; position: absolute; top: -10px; right: 20px; font-size: 8rem; color: rgba(16,185,129,0.05); font-family: serif; font-weight: 900; z-index: -1; line-height: 1;}
-        .testi-quote { font-size: 1.05rem; font-style: italic; color: var(--slate); margin-bottom: 2rem; line-height: 1.7; position: relative; z-index: 2;}
-        .testi-user { display: flex; align-items: center; gap: 15px; }
-        .testi-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.08); flex-shrink: 0; }
+        .testi-card { background: var(--surface); border-radius: 24px; padding: 2rem 1.75rem; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; z-index: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.02);}
+        .testi-card::before { content: '"'; position: absolute; top: -10px; right: 20px; font-size: 7rem; color: rgba(16,185,129,0.06); font-family: serif; font-weight: 900; z-index: -1; line-height: 1;}
+        .testi-quote { font-size: 1rem; font-style: italic; color: var(--slate); margin-bottom: 1.75rem; line-height: 1.7; position: relative; z-index: 2;}
+        .testi-user { display: flex; align-items: center; gap: 14px; }
+        .testi-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.08); flex-shrink: 0; }
         .testi-name { font-weight: 800; color: var(--dark); margin: 0; }
-        .testi-role { font-size: 0.85rem; color: var(--slate-light); margin: 0; font-weight: 600;}
+        .testi-role { font-size: 0.82rem; color: var(--slate-light); margin: 0; font-weight: 600;}
 
         /* ===== LOKASI ===== */
         .lokasi-section { padding: clamp(60px, 8vw, 100px) 0; background: var(--surface); }
-        .map-wrapper { border-radius: 28px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.08); border: 6px solid white; }
-        .map-wrapper iframe { width: 100%; aspect-ratio: 16 / 10; height: auto; display: block; }
+        .map-wrapper { border-radius: 26px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.08); border: 5px solid white; }
+        .map-wrapper iframe { width: 100%; min-height: 360px; aspect-ratio: 16 / 10; display: block; }
 
         /* ===== FOOTER & CTA ===== */
         .cta-box {
             background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            border-radius: 28px; padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem); text-align: center; color: white; position: relative; overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15); transform: translateY(60px); z-index: 10;
+            border-radius: 28px; padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 3.5rem); text-align: center; color: white; position: relative; overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.18); transform: translateY(50px); z-index: 10;
         }
         .cta-box::before { content: ''; position: absolute; width: 400px; height: 400px; background: var(--primary); filter: blur(120px); opacity: 0.25; top: -200px; right: -100px; border-radius: 50%; }
-        .cta-title { font-size: clamp(1.6rem, 5vw, 2.5rem); }
+        .cta-title { font-size: clamp(1.6rem, 5vw, 2.4rem); }
 
-        .footer { background: #020617; color: rgba(255,255,255,0.6); padding: clamp(90px, 15vw, 140px) 0 2rem; position: relative; }
-        .footer-title { color: white; font-weight: 800; font-size: 1.05rem; margin-bottom: 1.5rem; letter-spacing: 1px; }
-        .footer-link { color: rgba(255,255,255,0.5); text-decoration: none; display: block; margin-bottom: 0.8rem; transition: all 0.3s ease; font-weight: 500; padding: 2px 0;}
-        .footer-link:hover { color: var(--primary); transform: translateX(5px); }
-        .social-icons a { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.05); color: white; transition: all 0.3s ease; margin-right: 10px; }
+        .footer { background: #020617; color: rgba(255,255,255,0.65); padding: clamp(80px, 15vw, 120px) 0 2rem; position: relative; }
+        .footer-title { color: white; font-weight: 800; font-size: 1.05rem; margin-bottom: 1.3rem; letter-spacing: 0.5px; }
+        .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; display: block; margin-bottom: 0.75rem; transition: all 0.3s ease; font-weight: 500; padding: 2px 0;}
+        .footer-link:hover { color: var(--primary); transform: translateX(4px); }
+        .social-icons a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.06); color: white; transition: all 0.3s ease; margin-right: 8px; }
         .social-icons a:hover { background: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16,185,129,0.3); }
         .footer-newsletter-form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .footer-newsletter-form input { flex: 1 1 180px; }
@@ -416,8 +452,8 @@
 
         /* ===== BACK TO TOP ===== */
         .back-to-top {
-            position: fixed; bottom: 30px; left: 30px; z-index: 1040;
-            width: 48px; height: 48px; border-radius: 50%; border: none;
+            position: fixed; bottom: 24px; left: 24px; z-index: 1040;
+            width: 46px; height: 46px; border-radius: 50%; border: none;
             background: var(--dark); color: #fff; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer;
             opacity: 0; visibility: hidden; transform: translateY(10px);
@@ -426,34 +462,37 @@
         .back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .back-to-top:hover { background: var(--primary-dark); }
 
+        /* ===== RESPONSIVE MEDIA QUERIES ===== */
         @media (max-width: 991px) {
-            .hero-section { padding: 120px 0 70px; text-align: center; min-height: auto; }
+            .hero-section { padding: 130px 0 70px; text-align: center; }
             .hero-buttons { justify-content: center; }
-            .hero-buttons a { flex: 1 1 auto; }
-            .hero-highlights { grid-template-columns: 1fr; }
+            .hero-buttons a { flex: 1 1 auto; max-width: 280px; }
+            .hero-apk-wrap { margin-left: auto; margin-right: auto; }
+            .hero-highlights { grid-template-columns: 1fr; margin-left: auto; margin-right: auto; text-align: left; }
             .hero-stats { justify-content: center; }
-            .hero-image-main { transform: none; margin-top: 2.5rem; }
-            .hero-image-main img { height: 340px; }
-            .floating-card { display: none; }
-            .cta-box { padding: 3rem 1.75rem; transform: translateY(40px); }
-            .navbar-collapse { margin-top: 1rem; padding-bottom: 0.5rem; }
-            .navbar-nav { text-align: center; }
+            .hero-image-main { transform: none; margin-top: 2rem; }
+            .hero-image-main img { height: 350px; }
+            .floating-card-1 { bottom: 20px; left: 10px; transform: scale(0.9); }
+            .floating-card-2 { top: 20px; right: 10px; transform: scale(0.9); }
+            .cta-box { padding: 3rem 1.5rem; transform: translateY(40px); }
         }
 
         @media (max-width: 575px) {
-            .hero-section { padding: 105px 0 60px; }
-            .hero-image-main img { height: 240px; }
-            .hero-buttons { flex-direction: column; }
-            .hero-buttons a { width: 100%; }
-            .hero-stats { gap: 2rem !important; }
-            .back-to-top { left: 20px; bottom: 20px; width: 44px; height: 44px; }
+            .hero-section { padding: 115px 0 60px; }
+            .hero-image-main img { height: 260px; }
+            .hero-buttons { flex-direction: column; align-items: center; width: 100%; }
+            .hero-buttons a { width: 100%; max-width: 100%; }
+            .hero-stats { flex-direction: column; gap: 0.85rem !important; align-items: stretch; }
+            .stat-box { justify-content: center; }
+            .back-to-top { left: 16px; bottom: 16px; width: 42px; height: 42px; }
+            .floating-card { display: none; }
         }
 
         @media (max-width: 380px) {
             .hero-title { letter-spacing: -0.5px; }
-            .navbar-brand-custom { font-size: 1.05rem; }
+            .navbar-brand-custom { font-size: 1.1rem; }
             .brand-logo { width: 36px; height: 36px; }
-            .hero-image-main img { height: 200px; }
+            .hero-image-main img { height: 220px; }
         }
 
         @media (max-width: 340px) {
@@ -462,81 +501,92 @@
 
         /* ===== AI CHATBOT WIDGET ===== */
         .chatbot-container {
-            position: fixed; bottom: 30px; right: 30px; z-index: 1050;
-            display: flex; flex-direction: column; align-items: flex-end; gap: 15px;
+            position: fixed; bottom: 24px; right: 24px; z-index: 1050;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
         .chatbot-tooltip {
-            background: white; color: var(--dark); padding: 12px 18px; border-radius: 16px; font-size: 0.9rem;
-            font-weight: 700; box-shadow: 0 15px 35px rgba(0,0,0,0.1); position: relative; transform-origin: bottom right;
-            animation: bounceTooltip 2.5s infinite; cursor: pointer; border: 1px solid rgba(0,0,0,0.05);
+            background: white; color: var(--dark); padding: 10px 16px; border-radius: 16px; font-size: 0.85rem;
+            font-weight: 700; box-shadow: 0 15px 35px rgba(0,0,0,0.12); position: relative; transform-origin: bottom right;
+            animation: bounceTooltip 2.5s infinite; cursor: pointer; border: 1px solid rgba(0,0,0,0.06);
         }
         .chatbot-tooltip::after {
             content: ''; position: absolute; bottom: -6px; right: 24px; width: 14px; height: 14px;
-            background: white; transform: rotate(45deg); border-right: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: white; transform: rotate(45deg); border-right: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06);
         }
-        @keyframes bounceTooltip { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes bounceTooltip { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .chatbot-toggler {
-            width: 65px; height: 65px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4); border: 2px solid rgba(255,255,255,0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); border: 2px solid rgba(255,255,255,0.25); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
         }
-        .chatbot-toggler:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5); }
+        .chatbot-toggler:hover { transform: scale(1.08) rotate(5deg); box-shadow: 0 15px 32px rgba(16, 185, 129, 0.5); }
         .chatbot-toggler .close-icon { display: none; }
         .show-chatbot .chatbot-toggler .chat-icon { display: none; }
         .show-chatbot .chatbot-toggler .close-icon { display: block; }
         .show-chatbot .chatbot-tooltip { display: none; }
 
         .chatbot-window {
-            position: absolute; bottom: 85px; right: 0; width: 360px; max-width: calc(100vw - 40px);
+            position: absolute; bottom: 76px; right: 0; width: 360px; max-width: calc(100vw - 36px);
             background: white; border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15); transform: scale(0.5); opacity: 0; pointer-events: none; transform-origin: bottom right;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.18); transform: scale(0.5); opacity: 0; pointer-events: none; transform-origin: bottom right;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(0,0,0,0.06);
         }
         .show-chatbot .chatbot-window { transform: scale(1); opacity: 1; pointer-events: auto; }
 
-        .chat-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 18px 20px; display: flex; align-items: center; gap: 14px; color: white; }
-        .chat-header img { width: 44px; height: 44px; border-radius: 50%; background: white; padding: 2px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;}
-        .chat-title { font-weight: 800; font-size: 1.1rem; line-height: 1.2; margin: 0; }
-        .chat-status { font-size: 0.85rem; opacity: 0.9; display: flex; align-items: center; gap: 6px; font-weight: 500;}
+        .chat-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 16px 18px; display: flex; align-items: center; gap: 12px; color: white; }
+        .chat-header img { width: 42px; height: 42px; border-radius: 50%; background: white; padding: 2px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;}
+        .chat-title { font-weight: 800; font-size: 1.05rem; line-height: 1.2; margin: 0; }
+        .chat-status { font-size: 0.82rem; opacity: 0.9; display: flex; align-items: center; gap: 6px; font-weight: 500;}
         .chat-status::before { content: ''; width: 8px; height: 8px; background: #34d399; border-radius: 50%; animation: pulse-status 2s infinite; box-shadow: 0 0 0 rgba(52, 211, 153, 0.4);}
         @keyframes pulse-status { 0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); } }
 
-        .chat-body { height: min(400px, 58vh); overflow-y: auto; padding: 20px; background: #f8fafc; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .chat-body { height: min(380px, 55vh); overflow-y: auto; padding: 18px; background: #f8fafc; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 
-        .message { max-width: 85%; font-size: 0.95rem; line-height: 1.5; padding: 14px 18px; position: relative; }
-        .bot-message { background: white; color: var(--slate); border-radius: 4px 20px 20px 20px; border: 1px solid #e2e8f0; align-self: flex-start; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .user-message { background: var(--primary); color: white; border-radius: 20px 20px 4px 20px; align-self: flex-end; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
+        .message { max-width: 86%; font-size: 0.92rem; line-height: 1.5; padding: 12px 16px; position: relative; word-wrap: break-word; }
+        .bot-message { background: white; color: var(--slate); border-radius: 4px 18px 18px 18px; border: 1px solid #e2e8f0; align-self: flex-start; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .user-message { background: var(--primary); color: white; border-radius: 18px 18px 4px 18px; align-self: flex-end; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
 
-        .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-        .quick-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 10px 14px; border-radius: 50rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); min-height: 40px;}
+        .quick-replies { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .quick-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px 13px; border-radius: 50rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); min-height: 38px;}
         .quick-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16,185,129,0.2);}
 
-        .chat-input-area { padding: 14px 16px; background: white; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
-        .chat-input { flex-grow: 1; border: 1px solid #e2e8f0; background: #f8fafc; padding: 13px 18px; border-radius: 50rem; font-size: 0.95rem; outline: none; transition: all 0.3s ease; min-width: 0; }
+        .chat-input-area { padding: 12px 14px; background: white; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: 8px; }
+        .chat-input { flex-grow: 1; border: 1px solid #e2e8f0; background: #f8fafc; padding: 11px 16px; border-radius: 50rem; font-size: 0.92rem; outline: none; transition: all 0.3s ease; min-width: 0; }
         .chat-input:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.1); border-color: var(--primary-light); background: white; }
-        .send-btn { background: var(--primary); color: white; border: none; width: 45px; height: 45px; min-width: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(16,185,129,0.2);}
+        .send-btn { background: var(--primary); color: white; border: none; width: 42px; height: 42px; min-width: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(16,185,129,0.2);}
         .send-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
-        .send-btn svg { width: 20px; height: 20px; transform: translateX(-1px) translateY(1px); }
+        .send-btn svg { width: 18px; height: 18px; transform: translateX(-1px) translateY(1px); }
 
-        .typing-indicator { display: none; gap: 5px; padding: 14px 20px; background: white; border-radius: 4px 20px 20px 20px; align-self: flex-start; border: 1px solid #e2e8f0; }
-        .typing-indicator span { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
+        .typing-indicator { display: none; gap: 5px; padding: 12px 16px; background: white; border-radius: 4px 18px 18px 18px; align-self: flex-start; border: 1px solid #e2e8f0; }
+        .typing-indicator span { width: 7px; height: 7px; background: #cbd5e1; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; background: var(--primary); } }
 
         @media (max-width: 576px) {
-            .chatbot-container { right: 16px; bottom: 16px; }
-            .chatbot-toggler { width: 58px; height: 58px; }
-            .chatbot-tooltip { max-width: 60vw; font-size: 0.8rem; padding: 10px 14px; }
-            .chatbot-window { width: calc(100vw - 32px); bottom: 74px; right: 0; }
-            .chat-body { height: min(360px, 50vh); }
+            .chatbot-container { right: 14px; bottom: 14px; }
+            .chatbot-toggler { width: 54px; height: 54px; }
+            .chatbot-tooltip { max-width: 65vw; font-size: 0.8rem; padding: 8px 12px; }
+            .chatbot-window { width: calc(100vw - 28px); bottom: 68px; right: 0; max-height: 75vh; }
+            .chat-body { height: min(340px, 46vh); }
         }
         @media (max-height: 700px) {
-            .chat-body { height: 45vh; }
+            .chat-body { height: 42vh; }
         }
+
+        /* ===== INTERACTIVE CHAT EXTENSIONS ===== */
+        .chat-header-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+        .chat-icon-btn { background: rgba(255,255,255,0.18); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .chat-icon-btn:hover { background: rgba(255,255,255,0.32); transform: scale(1.05); }
+        .chat-card-mini { background: #f1f5f9; border-radius: 14px; padding: 12px; margin-top: 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: var(--dark); }
+        .chat-btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary); color: white !important; padding: 7px 14px; border-radius: 50rem; text-decoration: none; font-weight: 700; font-size: 0.82rem; margin-top: 10px; transition: 0.2s; border: none; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(16,185,129,0.2); }
+        .chat-btn-action:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16,185,129,0.3); }
+        .chat-calc-box { background: white; border: 1px solid #cbd5e1; border-radius: 14px; padding: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .chat-calc-select, .chat-calc-input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; margin-bottom: 8px; outline: none; background: #f8fafc; }
+        .chat-calc-select:focus, .chat-calc-input:focus { border-color: var(--primary); background: white; }
     </style>
 </head>
 <body>
@@ -549,11 +599,11 @@
 
     <nav class="navbar navbar-expand-lg fixed-top navbar-custom" id="mainNav">
         <div class="container">
-            <a class="navbar-brand-custom d-flex align-items-center gap-3" href="#beranda">
+            <a class="navbar-brand-custom" href="#beranda">
                 <img src="{{ asset('image/BankSampahlogo.png') }}" alt="Logo Bank Sampah Subang" class="brand-logo">
                 <span>Bank Sampah Subang</span>
             </a>
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Buka menu navigasi">
+            <button class="navbar-toggler border-0 shadow-none p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Buka menu navigasi">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -565,7 +615,7 @@
                     <li class="nav-item"><a class="nav-link-custom" href="#artikel">Edukasi</a></li>
                     <li class="nav-item"><a class="nav-link-custom" href="#lokasi">Lokasi</a></li>
                 </ul>
-                <div class="mt-3 mt-lg-0 text-center">
+                <div class="mt-2 mt-lg-0 text-center">
                     <a href="{{ route('admin.login') ?? '#' }}" class="btn-masuk">
                         Masuk Sistem
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -577,7 +627,7 @@
 
     <section id="beranda" class="hero-section">
         <div class="container">
-            <div class="row align-items-center g-5">
+            <div class="row align-items-center g-4 g-lg-5">
                 <div class="col-12 col-lg-6" data-aos="fade-right" data-aos-duration="1000">
                     <div class="hero-badge">
                         <span class="pulse-dot"></span> Ekosistem Digital Terpadu
@@ -586,12 +636,15 @@
                         Jadikan Sampahmu<br>
                         <span class="gradient-text">Lebih Bernilai.</span>
                     </h1>
-                    <p class="hero-desc">
+                    <p class="hero-desc mx-auto mx-lg-0">
                         Ubah kebiasaan membuang sampah menjadi menabung. Dapatkan penghasilan tambahan dan bantu wujudkan Kabupaten Subang yang bersih dan lestari.
                     </p>
 
                     <div class="hero-buttons mb-3">
-                        <a href="#harga" class="btn-hero-primary">Cek Harga Hari Ini</a>
+                        <a href="#harga" class="btn-hero-primary">
+                            Cek Harga Hari Ini
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </a>
                         <a href="#cara-kerja" class="btn-hero-secondary">Pelajari Caranya</a>
                     </div>
 
@@ -599,29 +652,29 @@
                         <div class="highlight-card">
                             <span class="highlight-icon">💚</span>
                             <div>
-                                <div class="fw-bold">Menabung dari Sampah</div>
+                                <div class="fw-bold text-dark">Menabung dari Sampah</div>
                                 <p class="text-muted small mb-0">Dapatkan saldo setiap kali setor sampah bersih dan terpilah.</p>
                             </div>
                         </div>
                         <div class="highlight-card">
                             <span class="highlight-icon">🔄</span>
                             <div>
-                                <div class="fw-bold">Transparan & Aman</div>
+                                <div class="fw-bold text-dark">Transparan & Aman</div>
                                 <p class="text-muted small mb-0">Riwayat saldo dan harga bisa dicek langsung di aplikasi.</p>
                             </div>
                         </div>
                         <div class="highlight-card">
                             <span class="highlight-icon">📍</span>
                             <div>
-                                <div class="fw-bold">Akses Mudah</div>
+                                <div class="fw-bold text-dark">Akses Mudah</div>
                                 <p class="text-muted small mb-0">Cek lokasi dan jadwal operasional sebelum datang.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-4 mb-lg-5" style="max-width: 420px; margin-left: auto; margin-right: auto;">
+                    <div class="hero-apk-wrap">
                         <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn-hero-dark w-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <path d="M4 10l0 6"></path>
                                 <path d="M20 10l0 6"></path>
@@ -635,14 +688,24 @@
                         </a>
                     </div>
 
-                    <div class="hero-stats d-flex gap-4 justify-content-center justify-content-lg-start flex-wrap">
-                        <div class="text-center text-lg-start">
-                            <div class="hero-stat-num"><span class="counter" data-target="{{ $totalNasabah ?? 0 }}">0</span>+</div>
-                            <div class="hero-stat-label">Nasabah Aktif</div>
+                    <div class="hero-stats">
+                        <div class="stat-box">
+                            <div class="icon-box-primary" style="width:42px; height:42px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div>
+                                <div class="hero-stat-num"><span class="counter" data-target="{{ $totalNasabah ?? 0 }}">0</span>+</div>
+                                <div class="hero-stat-label">Nasabah Aktif</div>
+                            </div>
                         </div>
-                        <div class="text-center text-lg-start">
-                            <div class="hero-stat-num"><span class="counter" data-target="{{ $totalSampah ?? 0 }}">0</span><span class="fs-5 ms-1">kg</span></div>
-                            <div class="hero-stat-label">Sampah Dikelola</div>
+                        <div class="stat-box">
+                            <div class="icon-box-success" style="width:42px; height:42px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                            </div>
+                            <div>
+                                <div class="hero-stat-num"><span class="counter" data-target="{{ $totalSampah ?? 0 }}">0</span><span class="fs-6 ms-1">kg</span></div>
+                                <div class="hero-stat-label">Sampah Dikelola</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -680,44 +743,49 @@
             <div class="text-center mb-5" data-aos="fade-up">
                 <div class="section-label">Langkah Mudah</div>
                 <h2 class="section-title">Cara Mulai Menabung</h2>
+                <p class="section-desc">Hanya dengan 4 langkah sederhana, Anda bisa mulai menukar sampah rumah tangga menjadi pundi-pundi rupiah.</p>
             </div>
             <div class="timeline-wrapper">
                 <div class="timeline-line"></div>
                 <div class="row g-4">
                     <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
                         <div class="step-card text-center">
+                            <span class="step-badge">01</span>
                             <div class="step-icon-wrap">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                             </div>
                             <h3 class="fw-bolder text-dark fs-5 mb-2">Daftar Akun</h3>
-                            <p class="text-muted lh-base font-medium mb-0">Daftarkan diri Anda sebagai nasabah Bank Sampah.</p>
+                            <p class="text-muted lh-base font-medium mb-0">Daftarkan diri Anda sebagai nasabah Bank Sampah di kantor atau via aplikasi.</p>
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
                         <div class="step-card text-center">
+                            <span class="step-badge">02</span>
                             <div class="step-icon-wrap">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>
                             </div>
                             <h3 class="fw-bolder text-dark fs-5 mb-2">Pilah Sampah</h3>
-                            <p class="text-muted lh-base font-medium mb-0">Pisahkan sampah organik dan anorganik dari rumah.</p>
+                            <p class="text-muted lh-base font-medium mb-0">Pisahkan sampah organik dan anorganik (plastik, logam, kertas) di rumah.</p>
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
                         <div class="step-card text-center">
+                            <span class="step-badge">03</span>
                             <div class="step-icon-wrap">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
                             </div>
                             <h3 class="fw-bolder text-dark fs-5 mb-2">Setor & Timbang</h3>
-                            <p class="text-muted lh-base font-medium mb-0">Bawa ke titik kumpul kami untuk ditimbang petugas.</p>
+                            <p class="text-muted lh-base font-medium mb-0">Bawa sampah ke titik kumpul atau kantor kami untuk ditimbang petugas secara akurat.</p>
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
                         <div class="step-card text-center">
+                            <span class="step-badge">04</span>
                             <div class="step-icon-wrap">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                             </div>
                             <h3 class="fw-bolder text-dark fs-5 mb-2">Cairkan Saldo</h3>
-                            <p class="text-muted lh-base font-medium mb-0">Saldo bertambah dan siap ditarik tunai kapan saja.</p>
+                            <p class="text-muted lh-base font-medium mb-0">Saldo langsung masuk ke tabungan digital dan siap ditarik tunai kapan saja.</p>
                         </div>
                     </div>
                 </div>
@@ -728,16 +796,24 @@
     <section id="harga" class="harga-section">
         <div class="harga-bg-glow"></div>
         <div class="container position-relative z-1">
-            <div class="text-center mb-5" data-aos="fade-up">
+            <div class="text-center mb-4" data-aos="fade-up">
                 <div class="section-label" style="color:var(--primary-light);">Transparansi Harga</div>
                 <h2 class="section-title text-white">Daftar Harga Beli Terkini</h2>
-                <p class="section-desc mx-auto text-white-50" style="max-width:600px;">Harga otomatis diperbarui dari sistem. Pastikan sampah dalam kondisi bersih untuk nilai tukar terbaik.</p>
+                <p class="section-desc mx-auto text-white-50" style="max-width:620px;">Harga otomatis diperbarui dari sistem. Pastikan sampah dalam kondisi bersih dan kering untuk mendapatkan nilai tukar terbaik.</p>
             </div>
 
-            <div class="row g-4 justify-content-center">
+            @if(isset($jenisSampah) && count($jenisSampah) > 0)
+            <div class="search-price-wrap" data-aos="fade-up">
+                <label for="priceSearchInput" class="visually-hidden">Cari jenis sampah</label>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="search-price-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="priceSearchInput" class="search-price-input" placeholder="Cari nama atau kategori sampah (cth: Kardus, Besi, Plastik)...">
+            </div>
+            @endif
+
+            <div class="row g-4 justify-content-center" id="priceGrid">
                 @if(isset($jenisSampah) && count($jenisSampah) > 0)
                     @foreach($jenisSampah as $index => $sampah)
-                    <div class="col-12 col-sm-6 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ $index * 100 }}">
+                    <div class="col-12 col-sm-6 col-lg-3 price-card-col" data-name="{{ strtolower($sampah->nama) }}" data-category="{{ strtolower($sampah->kategori ?? 'umum') }}" data-aos="zoom-in" data-aos-delay="{{ min(($index * 80), 400) }}">
                         <div class="harga-card">
                             <div class="harga-kategori">{{ $sampah->kategori ?? 'Umum' }}</div>
                             <div class="harga-nama">{{ $sampah->nama }}</div>
@@ -746,11 +822,15 @@
                         </div>
                     </div>
                     @endforeach
+                    <div class="col-12 text-center text-white-50 py-5 d-none" id="noPriceResult">
+                        <p class="fs-5 mb-1 fw-semibold">Pencarian tidak ditemukan.</p>
+                        <p class="small opacity-75">Coba kata kunci lain seperti "kertas" atau "botol".</p>
+                    </div>
                 @else
                     <div class="col-12 text-center text-white-50 py-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h4"/></svg>
-                        <p class="mb-0 fw-semibold">Daftar harga sedang diperbarui.</p>
-                        <p class="mb-0 small">Silakan cek kembali beberapa saat lagi.</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h4"/></svg>
+                        <p class="mb-0 fw-semibold fs-5">Daftar harga sedang diperbarui.</p>
+                        <p class="mb-0 small opacity-75">Silakan cek kembali beberapa saat lagi.</p>
                     </div>
                 @endif
             </div>
@@ -764,7 +844,7 @@
             <div class="text-center mb-5" data-aos="fade-up">
                 <div class="section-label">Pengepul & Partner</div>
                 <h2 class="section-title">Stok Sampah Siap Dijual</h2>
-                <p class="text-muted mx-auto" style="max-width: 550px;">Sampah yang sudah di-press dan siap dibeli. Hubungi kami untuk kerja sama pengambilan.</p>
+                <p class="text-muted mx-auto" style="max-width: 580px;">Sampah terpilah dan siap dibeli dalam partai besar. Hubungi kami untuk kerja sama pengambilan secara rutin.</p>
                 <a href="{{ route('publik.stok') ?? '#' }}" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold mt-3 transition hover-scale">
                     Lihat Semua Stok
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="ms-1 align-middle"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -774,23 +854,23 @@
                 @foreach($stokTersedia as $stok)
                 <div class="col-12 col-sm-6 col-lg-4" data-aos="fade-up">
                     <a href="{{ route('publik.stok.detail', $stok->slug ?? '') ?? '#' }}" class="text-decoration-none">
-                        <div class="stok-card">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="stok-card d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                                 <div>
                                     <h3 class="fw-bold text-dark mb-1 fs-5">{{ $stok->jenisSampah->nama ?? '-' }}</h3>
                                     <span class="badge rounded-pill" style="background: rgba(139,92,246,0.1); color: #7c3aed; border: 1px solid rgba(139,92,246,0.2); font-size: 0.7rem; padding: 4px 10px; font-weight:800;">PRESSED</span>
                                 </div>
-                                <div class="text-end">
+                                <div class="text-end flex-shrink-0">
                                     <div class="fw-bold fs-4" style="color: #10b981; letter-spacing: -0.5px;">Rp {{ number_format($stok->harga_jual_per_kg ?? 0, 0, ',', '.') }}</div>
                                     <div class="text-muted small fw-semibold">/kg</div>
                                 </div>
                             </div>
                             @if(!empty($stok->gambar))
-                            <div class="mb-4 mt-3 rounded-4 overflow-hidden shadow-sm" style="max-height: 140px;">
-                                <img src="{{ asset('storage/' . $stok->gambar) }}" alt="Foto {{ $stok->jenisSampah->nama ?? '' }}" class="w-100" style="object-fit: cover; height: 140px;" loading="lazy">
+                            <div class="mb-4 mt-2 rounded-4 overflow-hidden shadow-sm" style="max-height: 160px;">
+                                <img src="{{ asset('storage/' . $stok->gambar) }}" alt="Foto {{ $stok->jenisSampah->nama ?? '' }}" class="w-100" style="object-fit: cover; height: 160px;" loading="lazy">
                             </div>
                             @endif
-                            <div class="mb-3">
+                            <div class="mb-3 mt-auto">
                                 <div class="d-flex justify-content-between mb-2 small">
                                     <span class="text-muted fw-semibold">Tersedia</span>
                                     <span class="fw-bold text-dark">{{ number_format($stok->stok_tersisa_kg ?? 0, 1, ',', '.') }} kg</span>
@@ -822,6 +902,7 @@
                 <div>
                     <div class="section-label">Pojok Literasi</div>
                     <h2 class="section-title">Edukasi & Berita Terbaru</h2>
+                    <p class="section-desc mb-0">Tingkatkan wawasan seputar kelestarian lingkungan dan inovasi daur ulang sampah.</p>
                 </div>
                 <a href="#" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold mb-2 transition hover-scale">Lihat Semua Berita</a>
             </div>
@@ -851,10 +932,10 @@
                     </div>
                     @endforeach
                 @else
-                    <div class="col-12 text-center text-muted py-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <p class="mb-0 fw-semibold">Belum ada artikel yang dipublikasikan.</p>
-                        <p class="mb-0 small">Nantikan konten edukasi terbaru dari kami di sini.</p>
+                    <div class="col-12 text-center text-muted py-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-3 opacity-50"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <p class="mb-0 fw-semibold fs-5">Belum ada artikel yang dipublikasikan.</p>
+                        <p class="mb-0 small opacity-75">Nantikan konten edukasi dan berita terbaru dari kami di sini.</p>
                     </div>
                 @endif
             </div>
@@ -865,7 +946,7 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <h2 class="section-title">Apa Kata Warga Subang?</h2>
-                <p class="section-desc mx-auto text-slate fw-medium">Pengalaman mereka setelah bergabung menjadi bagian dari perubahan.</p>
+                <p class="section-desc mx-auto text-slate fw-medium">Pengalaman inspiratif nasabah setelah bergabung menjadi bagian dari perubahan.</p>
             </div>
             <div class="row g-4">
                 <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
@@ -910,11 +991,11 @@
 
     <section id="lokasi" class="lokasi-section">
         <div class="container">
-            <div class="row align-items-center g-5">
+            <div class="row align-items-center g-4 g-lg-5">
                 <div class="col-12 col-lg-5" data-aos="fade-right">
                     <div class="section-label">Kunjungi Kami</div>
                     <h2 class="section-title">Kantor Pelayanan Bank Sampah</h2>
-                    <p class="section-desc mb-5 text-slate fw-medium">Tim kami siap melayani penimbangan sampah dan pencairan dana Anda setiap hari kerja.</p>
+                    <p class="section-desc mb-4 mb-lg-5 text-slate fw-medium">Tim kami siap melayani penimbangan sampah dan pencairan dana Anda setiap hari kerja.</p>
 
                     <div class="d-flex align-items-center gap-4 mb-4">
                         <div class="icon-box-large">
@@ -948,14 +1029,14 @@
         <div class="container">
             <div class="cta-box" data-aos="zoom-in">
                 <h2 class="cta-title fw-bolder mb-3">Siap Wujudkan Lingkungan Bersih?</h2>
-                <p class="cta-desc mx-auto mb-4 text-white-50 fs-5" style="max-width: 600px;">Pendaftaran gratis. Mulai kelola sampahmu hari ini dan nikmati manfaat ekonominya untuk keluarga.</p>
+                <p class="cta-desc mx-auto mb-4 text-white-50 fs-5" style="max-width: 620px;">Pendaftaran gratis dan mudah. Mulai kelola sampahmu hari ini dan nikmati manfaat ekonominya untuk keluarga.</p>
 
                 <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
-                    <a href="{{ route('admin.login') ?? '#' }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-success d-inline-flex align-items-center gap-2 shadow-lg" style="transition: transform 0.3s;">
+                    <a href="{{ route('admin.login') ?? '#' }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-success d-inline-flex align-items-center justify-content-center gap-2 shadow-lg" style="transition: transform 0.3s; min-height: 50px;">
                         Gabung Sekarang
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </a>
-                    <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn border border-light border-opacity-25 text-white rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center gap-2" style="background: rgba(255,255,255,0.05); transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                    <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="btn border border-light border-opacity-25 text-white rounded-pill px-5 py-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2" style="background: rgba(255,255,255,0.08); transition: all 0.3s; min-height: 50px;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 10l0 6"></path><path d="M20 10l0 6"></path><path d="M7 9h10v8a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-8a5 5 0 0 1 10 0"></path><path d="M8 3l1 2"></path><path d="M16 3l-1 2"></path><path d="M9 18l0 3"></path><path d="M15 18l0 3"></path></svg>
                         Download APK
                     </a>
@@ -994,7 +1075,7 @@
                 </div>
                 <div class="col-12 col-lg-4">
                     <h4 class="footer-title fs-6">Berlangganan Info</h4>
-                    <p class="footer-desc mb-3">Dapatkan info kenaikan harga sampah dan edukasi terbaru.</p>
+                    <p class="footer-desc mb-3">Dapatkan info kenaikan harga sampah dan edukasi terbaru langsung di email Anda.</p>
                     <form class="footer-newsletter-form" id="newsletterForm">
                         <label for="newsletter-email" class="visually-hidden">Alamat email</label>
                         <input type="email" id="newsletter-email" class="form-control bg-dark border-secondary text-white shadow-none" placeholder="Alamat email Anda" required style="border-radius: 50rem; padding: 0.75rem 1.2rem;">
@@ -1018,8 +1099,8 @@
             Ada pertanyaan? Nura siap bantu! 👋
         </div>
         <button class="chatbot-toggler" aria-label="Buka chat dengan Nura AI Asisten" aria-expanded="false">
-            <svg xmlns="http://www.w3.org/2000/svg" class="chat-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" class="close-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="chat-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="close-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
     </div>
 
@@ -1030,12 +1111,22 @@
                 <h4 class="chat-title">Nura AI Asisten</h4>
                 <div class="chat-status">Online siap membantu</div>
             </div>
+            <div class="chat-header-actions">
+                <button class="chat-icon-btn" id="soundToggleBtn" title="Aktifkan/Matikan Suara" aria-label="Toggle suara chat">
+                    <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <svg id="soundIconOff" class="d-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                </button>
+                <button class="chat-icon-btn" id="resetChatBtn" title="Bersihkan Percakapan" aria-label="Reset chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </div>
         </div>
         <div class="chat-body" id="chat-body">
             <div class="quick-replies" id="quick-replies">
-                <button class="quick-btn" onclick="sendQuickReply('Cara Daftar')">Cara Daftar</button>
-                <button class="quick-btn" onclick="sendQuickReply('Cek Harga')">Cek Harga</button>
-                <button class="quick-btn" onclick="sendQuickReply('Lokasi Bank')">Lokasi Bank</button>
+                <button class="quick-btn" onclick="sendQuickReply('🧮 Simulasikan Saldo')">🧮 Simulasikan Saldo</button>
+                <button class="quick-btn" onclick="sendQuickReply('Cek Harga')">💰 Cek Harga</button>
+                <button class="quick-btn" onclick="sendQuickReply('Cara Daftar')">🚀 Cara Daftar</button>
+                <button class="quick-btn" onclick="sendQuickReply('Jam Buka')">⏰ Jam Buka</button>
             </div>
             <div class="typing-indicator" id="typing-indicator">
                 <span></span><span></span><span></span>
@@ -1043,7 +1134,7 @@
         </div>
         <div class="chat-input-area">
             <label for="chat-input" class="visually-hidden">Ketik pesan</label>
-            <input type="text" id="chat-input" class="chat-input" placeholder="Ketik pesan di sini..." autocomplete="off">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Tanya Nura (cth: harga kardus, cara setor)..." autocomplete="off">
             <button class="send-btn" id="send-btn" aria-label="Kirim pesan">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z"/></svg>
             </button>
@@ -1085,6 +1176,37 @@
             });
         }, { passive: true });
 
+        /* Fitur Live Search untuk Daftar Harga */
+        const priceSearchInput = document.getElementById('priceSearchInput');
+        const priceCols = document.querySelectorAll('.price-card-col');
+        const noPriceResult = document.getElementById('noPriceResult');
+
+        if (priceSearchInput && priceCols.length > 0) {
+            priceSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                let matchCount = 0;
+
+                priceCols.forEach(col => {
+                    const name = col.getAttribute('data-name') || '';
+                    const category = col.getAttribute('data-category') || '';
+                    if (name.includes(query) || category.includes(query)) {
+                        col.classList.remove('d-none');
+                        matchCount++;
+                    } else {
+                        col.classList.add('d-none');
+                    }
+                });
+
+                if (noPriceResult) {
+                    if (matchCount === 0) {
+                        noPriceResult.classList.remove('d-none');
+                    } else {
+                        noPriceResult.classList.add('d-none');
+                    }
+                }
+            });
+        }
+
         /* Back to top button */
         const backToTopBtn = document.getElementById('backToTop');
         window.addEventListener('scroll', () => {
@@ -1116,7 +1238,7 @@
         });
 
         /* =======================================
-           LOGIKA NURA AI (CHATBOT)
+           LOGIKA INTERAKTIF NURA AI (CHATBOT)
            ======================================= */
         const chatbotToggler = document.querySelector(".chatbot-toggler");
         const chatbotWindow = document.querySelector(".chatbot-window");
@@ -1125,6 +1247,45 @@
         const sendBtn = document.getElementById("send-btn");
         const typingIndicator = document.getElementById("typing-indicator");
         const quickReplies = document.getElementById("quick-replies");
+        const soundToggleBtn = document.getElementById("soundToggleBtn");
+        const soundIconOn = document.getElementById("soundIconOn");
+        const soundIconOff = document.getElementById("soundIconOff");
+        const resetChatBtn = document.getElementById("resetChatBtn");
+
+        let audioEnabled = true;
+
+        /* Synthesized Web Audio Tone for Bot Replies */
+        const playPopSound = () => {
+            if (!audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1); // A5 note
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch (e) {
+                /* Audio context not allowed or blocked by browser */
+            }
+        };
+
+        soundToggleBtn.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            if (audioEnabled) {
+                soundIconOn.classList.remove('d-none');
+                soundIconOff.classList.add('d-none');
+                playPopSound();
+            } else {
+                soundIconOn.classList.add('d-none');
+                soundIconOff.classList.remove('d-none');
+            }
+        });
 
         const getGreetingTime = () => {
             const hour = new Date().getHours();
@@ -1138,19 +1299,22 @@
             document.querySelectorAll('.message').forEach(e => e.remove());
             const welcomeMsg = document.createElement("div");
             welcomeMsg.classList.add("message", "bot-message", "shadow-sm");
-            welcomeMsg.innerHTML = `Halo Kak! Selamat ${getGreetingTime()}! 👋<br>Saya Nura, asisten cerdas dari Bank Sampah Subang. Mau tanya apa nih Kak? Nura siap bantu! ✨`;
+            welcomeMsg.innerHTML = `Halo Kak! Selamat ${getGreetingTime()}! 👋<br>Saya Nura, asisten cerdas Bank Sampah Subang. Kakak bisa klik tombol di bawah atau ketik langsung pertanyaan seputar layanan kami! ✨`;
 
             chatBody.insertBefore(welcomeMsg, quickReplies);
             quickReplies.style.display = "flex";
             chatBody.scrollTop = 0;
         };
 
+        resetChatBtn.addEventListener('click', () => {
+            initChat();
+        });
+
         const closeChatbot = () => {
             document.body.classList.remove("show-chatbot");
             chatbotToggler.setAttribute('aria-expanded', 'false');
             chatbotWindow.setAttribute('inert', '');
             chatbotToggler.focus({ preventScroll: true });
-            setTimeout(initChat, 400);
         };
 
         const openChatbot = () => {
@@ -1176,43 +1340,10 @@
             }
         });
 
-        /* Hentikan animasi tooltip setelah beberapa saat agar tidak mengganggu pembaca */
         const chatbotTooltipEl = document.querySelector('.chatbot-tooltip');
         if (chatbotTooltipEl) {
             setTimeout(() => { chatbotTooltipEl.style.animation = 'none'; }, 12000);
         }
-
-        const botDatabase = {
-            salam: ["halo", "hai", "hi", "pagi", "siang", "sore", "malam", "assalamualaikum", "nura", "ping"],
-            daftar: ["daftar", "gabung", "registrasi", "join", "bikin", "akun", "buat"],
-            harga: ["harga", "berapa", "kilo", "duit", "rp", "nilai", "jual", "uang", "harganya"],
-            lokasi: ["lokasi", "alamat", "dimana", "tempat", "kantor", "map", "titik", "cabang"],
-            tarik: ["tarik", "cair", "uang", "ambil", "withdraw", "saldo", "pencairan"],
-            jam: ["jam", "buka", "tutup", "operasional", "kapan", "hari", "kerja"],
-            terimakasih: ["terima", "kasih", "thanks", "makasih", "ok", "oke", "sip", "mantap", "paham", "jelas", "baik"]
-        };
-
-        const botAnswers = {
-            salam: `Halo Kak, Selamat ${getGreetingTime()}! 😊 Gimana kabarnya? Silakan tanya aja apa pun seputar Bank Sampah ya!`,
-            daftar: "Wah, mau ikutan nabung sampah ya Kak? Gampang banget! Cukup bawa KTP ke kantor kami, atau Kakak bisa minta bantuan Admin buat daftarin. Nanti Kakak dapat buku tabungan khusus! 🎉",
-            harga: "Soal harga, Nura pastikan kita pakai harga update Kak! 💰 Plastik, logam, kardus... Semua ada harganya. Kakak bisa cek selengkapnya di tabel <b>'Daftar Harga Beli'</b> di website ini ya.",
-            lokasi: "Titik kumpul dan kantor utama kami berlokasi di <b>Kabupaten Subang, Jawa Barat</b>. Kalau Kakak bingung jalannya, tinggal <i>scroll</i> web ini paling bawah buat lihat rute di Google Maps. 🗺️",
-            tarik: "Saldo tabungan sampah Kakak itu beneran uang nyata lho! Bisa ditarik kapan pun pas jam kerja kami. Cukup bawa buku tabungannya aja ke kasir. 💸",
-            jam: "Kita buka dari <b>Senin sampai Jumat, mulai jam 08:00 pagi sampai 15:00 sore</b> Kak. Pastiin jangan kesorean datengnya ya! ⏳",
-            terimakasih: "Sama-sama Kak! Nura seneng banget bisa bantu. Kalau ada bingung lagi, panggil Nura aja ya. Semangat terus jaga lingkungan kita! 💚🌿"
-        };
-
-        const defaultAnswers = [
-            "Waduh, Nura kurang paham maksud Kakak 😅. Coba tanya seputar <b>Harga, Cara Daftar, atau Lokasi</b> deh.",
-            "Hmm.. Nura masih terus belajar nih 🤖. Kakak bisa tanya soal <b>Jam Buka</b> atau <b>Cara Tarik Saldo</b> ya.",
-            "Maaf Kak, Nura belum dapet contekan soal itu 📚. Yuk tanya info layanan Bank Sampah yang lain aja!"
-        ];
-
-        const followUps = [
-            "<br><br><i>Btw, ada lagi yang mau ditanyain Kak? Nura standby nih!</i>",
-            "<br><br><i>Gimana Kak, udah cukup jelas belum infonya?</i>",
-            "<br><br><i>Ada info lain yang bisa Nura bantu carikan?</i>"
-        ];
 
         const appendMessage = (text, sender) => {
             const msgDiv = document.createElement("div");
@@ -1220,27 +1351,135 @@
             msgDiv.innerHTML = text;
             chatBody.insertBefore(msgDiv, typingIndicator);
             chatBody.scrollTop = chatBody.scrollHeight;
+            if (sender === "bot") playPopSound();
+        };
+
+        /* Dynamic Interactive Component Actions */
+        window.scrollToPriceAndSearch = () => {
+            closeChatbot();
+            const hargaSec = document.getElementById('harga');
+            if (hargaSec) {
+                hargaSec.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => {
+                    const pInput = document.getElementById('priceSearchInput');
+                    if (pInput) pInput.focus();
+                }, 800);
+            }
+        };
+
+        window.scrollToSection = (secId) => {
+            closeChatbot();
+            const sec = document.getElementById(secId);
+            if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.runChatSimulation = (formEl) => {
+            const typeSelect = formEl.querySelector('.chat-calc-select');
+            const kgInput = formEl.querySelector('.chat-calc-input');
+            const kg = parseFloat(kgInput.value) || 0;
+            if (kg <= 0) {
+                alert('Mohon masukkan berat perkiraan sampah (kg) yang valid.');
+                return;
+            }
+            const price = parseInt(typeSelect.value);
+            const name = typeSelect.options[typeSelect.selectedIndex].getAttribute('data-name');
+            const total = kg * price;
+
+            const replyText = `🎉 <b>Hasil Estimasi Simulasi:</b><br>Untuk <b>${kg} kg ${name}</b>, estimasi saldo yang akan Kakak dapatkan adalah <b>Rp ${total.toLocaleString('id-ID')}</b>!<br><div class="small text-muted mt-1">Saldo langsung masuk ke tabungan digital saat setelah ditimbang oleh petugas kami.</div>`;
+            appendMessage(replyText, "bot");
         };
 
         const generateBotResponse = (userText) => {
-            let reply = defaultAnswers[Math.floor(Math.random() * defaultAnswers.length)];
             const lowerText = userText.toLowerCase();
-            let matchedCategory = null;
+            let reply = "";
+            let nextChips = [];
 
             if(quickReplies) quickReplies.style.display = "none";
 
-            let found = false;
-            for (const category in botDatabase) {
-                if (botDatabase[category].some(keyword => lowerText.includes(keyword))) {
-                    reply = botAnswers[category];
-                    matchedCategory = category;
-                    found = true;
-                    break;
-                }
+            /* Interactive Logic Matcher */
+            if (lowerText.includes("simulasikan") || lowerText.includes("hitung") || lowerText.includes("kalkulator") || lowerText.includes("estimasi")) {
+                reply = `Ingin tahu perkiraan saldo yang akan didapat? Yuk hitung langsung di bawah ini:
+                <form class="chat-calc-box" onsubmit="event.preventDefault(); runChatSimulation(this);">
+                    <div class="fw-bold mb-1" style="font-size:0.8rem;">1. Pilih Jenis Sampah:</div>
+                    <select class="chat-calc-select">
+                        <option value="2500" data-name="Plastik Bersih">Plastik Bersih (~Rp 2.500/kg)</option>
+                        <option value="4000" data-name="Logam / Besi">Logam / Besi (~Rp 4.000/kg)</option>
+                        <option value="1800" data-name="Kardus / Kertas">Kardus / Kertas (~Rp 1.800/kg)</option>
+                        <option value="15000" data-name="Tembaga">Tembaga (~Rp 15.000/kg)</option>
+                    </select>
+                    <div class="fw-bold mb-1" style="font-size:0.8rem;">2. Perkiraan Berat (kg):</div>
+                    <input type="number" class="chat-calc-input" placeholder="Contoh: 5" min="0.1" step="0.1" required>
+                    <button type="submit" class="chat-btn-action mt-1">🧮 Hitung Estimasi Saldo</button>
+                </form>`;
+                nextChips = ['💰 Cek Harga Lengkap', '🚀 Cara Daftar', '⏰ Jam Buka'];
             }
+            else if (lowerText.includes("harga") || lowerText.includes("kilo") || lowerText.includes("berapa") || lowerText.includes("duit") || lowerText.includes("rp") || lowerText.includes("jual")) {
+                reply = `Harga beli sampah di Bank Sampah Subang selalu ter-update secara otomatis sesuai harga pasar dan kualitas sampah (bersih & terpilah).<br>
+                <div class="chat-card-mini">
+                    <div class="fw-bold text-success mb-1">💡 Tips Nilai Tinggi:</div>
+                    Pastikan sampah plastik & kardus dalam kondisi kering dan sudah dipisahkan dari kotoran sisa makanan ya!
+                </div>
+                <button type="button" class="chat-btn-action" onclick="scrollToPriceAndSearch()">🔍 Lihat & Cari Tabel Harga</button>`;
+                nextChips = ['🧮 Simulasikan Saldo', '🚀 Cara Daftar', '📍 Lokasi Bank'];
+            }
+            else if (lowerText.includes("daftar") || lowerText.includes("gabung") || lowerText.includes("registrasi") || lowerText.includes("buat akun") || lowerText.includes("join")) {
+                reply = `Mudah banget Kak! Anda bisa menjadi nasabah dengan langkah berikut:<br>
+                <div class="chat-card-mini">
+                    <b>1. Siapkan KTP</b> aktif.<br>
+                    <b>2. Datang ke Kantor Pelayanan</b> atau daftar via Aplikasi Mobile.<br>
+                    <b>3. Dapatkan Buku Tabungan</b> / Akun Digital aktif!
+                </div>
+                <a href="{{ route('admin.login') ?? '#' }}" class="chat-btn-action">🚀 Masuk / Daftar Sekarang</a>`;
+                nextChips = ['📱 Download APK', '💰 Cek Harga', '⏰ Jam Buka'];
+            }
+            else if (lowerText.includes("jam") || lowerText.includes("buka") || lowerText.includes("tutup") || lowerText.includes("operasional") || lowerText.includes("kapan")) {
+                const now = new Date();
+                const day = now.getDay(); // 0 = Sun, 6 = Sat
+                const hour = now.getHours();
+                const isOpen = (day >= 1 && day <= 5 && hour >= 8 && hour < 15);
+                const statusBadge = isOpen
+                    ? '<span class="badge bg-success">🟢 SEDANG BUKA</span>'
+                    : '<span class="badge bg-danger">🔴 SEDANG TUTUP</span>';
 
-            if (found && Math.random() > 0.6 && matchedCategory !== 'terimakasih' && matchedCategory !== 'salam') {
-                 reply += followUps[Math.floor(Math.random() * followUps.length)];
+                reply = `Status pelayanan kantor saat ini: ${statusBadge}<br><br>
+                <b>Jadwal Operasional Kami:</b><br>
+                📅 <b>Senin - Jumat:</b> 08:00 - 15:00 WIB<br>
+                📅 <b>Sabtu - Minggu & Libur Nasional:</b> Tutup<br>
+                <div class="small text-muted mt-2">Penerimaan sampah ditutup 30 menit sebelum jam operasional berakhir.</div>`;
+                nextChips = ['📍 Lokasi Bank', '💰 Cek Harga', '🧮 Simulasikan Saldo'];
+            }
+            else if (lowerText.includes("lokasi") || lowerText.includes("alamat") || lowerText.includes("dimana") || lowerText.includes("tempat") || lowerText.includes("kantor") || lowerText.includes("map") || lowerText.includes("titik")) {
+                reply = `Kantor pelayanan utama Bank Sampah Digital berlokasi di <b>Kabupaten Subang, Jawa Barat</b>.<br>
+                <div class="chat-card-mini">
+                    📍 <b>Fasilitas:</b> Timbangan digital akurat, loket penarikan tunai, dan area pemilahan edukatif.
+                </div>
+                <button type="button" class="chat-btn-action" onclick="scrollToSection('lokasi')">🗺️ Lihat Peta Google Maps</button>`;
+                nextChips = ['⏰ Jam Buka', '🚀 Cara Daftar', '🧮 Simulasikan Saldo'];
+            }
+            else if (lowerText.includes("tarik") || lowerText.includes("cair") || lowerText.includes("withdraw") || lowerText.includes("saldo") || lowerText.includes("uang")) {
+                reply = `Saldo tabungan sampah Anda adalah uang tunai nyata! 💸<br><br>
+                <b>Cara Pencairan:</b><br>
+                1. Bawa buku tabungan atau tunjukkan ID Nasabah di aplikasi.<br>
+                2. Kunjungi kasir kami pada jam operasional.<br>
+                3. Saldo langsung dicairkan tanpa potongan admin bulanan!`;
+                nextChips = ['⏰ Jam Buka', '📍 Lokasi Bank', '📱 Download APK'];
+            }
+            else if (lowerText.includes("apk") || lowerText.includes("download") || lowerText.includes("aplikasi") || lowerText.includes("android")) {
+                reply = `Dengan aplikasi mobile <b>Bank Sampah Digital Subang</b>, Anda bisa memantau saldo tabungan, riwayat setoran, dan update harga langsung dari HP! 📱✨<br>
+                <a href="{{ asset('download/banksampahdigital.apk') }}" download="BankSampahDigital.apk" class="chat-btn-action">📲 Download APK Mobile Sekarang</a>`;
+                nextChips = ['🚀 Cara Daftar', '💰 Cek Harga', '🧮 Simulasikan Saldo'];
+            }
+            else if (lowerText.includes("halo") || lowerText.includes("hai") || lowerText.includes("pagi") || lowerText.includes("siang") || lowerText.includes("sore") || lowerText.includes("malam") || lowerText.includes("assalam")) {
+                reply = `Halo Kak! Selamat ${getGreetingTime()}! 😊 Ada yang bisa Nura bantu hari ini? Kakak bisa pilih opsi di bawah ya:`;
+                nextChips = ['🧮 Simulasikan Saldo', '💰 Cek Harga', '🚀 Cara Daftar', '⏰ Jam Buka'];
+            }
+            else if (lowerText.includes("terima kasih") || lowerText.includes("makasih") || lowerText.includes("thanks") || lowerText.includes("oke") || lowerText.includes("sip") || lowerText.includes("mantap")) {
+                reply = `Sama-sama Kak! 💚 Senang sekali bisa membantu. Semangat terus kelola sampah dan wujudkan Subang yang bersih dan lestari! 🌿✨`;
+                nextChips = ['🧮 Simulasikan Saldo', '💰 Cek Harga'];
+            }
+            else {
+                reply = `Maaf Kak, Nura belum sepenuhnya paham pertanyaan itu 😅. Namun Nura siap membantu informasi seputar layanan utama kami di bawah ini:`;
+                nextChips = ['🧮 Simulasikan Saldo', '💰 Cek Harga', '🚀 Cara Daftar', '📍 Lokasi Bank'];
             }
 
             chatInput.disabled = true;
@@ -1252,7 +1491,23 @@
                 chatInput.disabled = false;
                 chatInput.focus();
                 appendMessage(reply, "bot");
-            }, 1200);
+
+                /* Render contextual next chips */
+                if (nextChips && nextChips.length > 0) {
+                    const chipsDiv = document.createElement("div");
+                    chipsDiv.classList.add("quick-replies");
+                    chipsDiv.style.display = "flex";
+                    nextChips.forEach(chipText => {
+                        const btn = document.createElement("button");
+                        btn.classList.add("quick-btn");
+                        btn.innerText = chipText;
+                        btn.onclick = () => sendQuickReply(chipText);
+                        chipsDiv.appendChild(btn);
+                    });
+                    chatBody.insertBefore(chipsDiv, typingIndicator);
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
+            }, 900);
         };
 
         const handleChat = () => {
@@ -1273,7 +1528,6 @@
             if (e.key === "Enter") handleChat();
         });
 
-        /* Newsletter: beri feedback jujur, belum terhubung ke backend */
         const newsletterForm = document.getElementById('newsletterForm');
         const newsletterFeedback = document.getElementById('newsletterFeedback');
         if (newsletterForm) {

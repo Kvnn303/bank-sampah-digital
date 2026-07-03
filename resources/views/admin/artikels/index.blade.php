@@ -289,21 +289,22 @@
                     </td>
                     <td class="pe-4 text-center">
                         <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill fw-semibold border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Aksi
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-slate-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                                <span>Aksi</span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 170px;">
                                 <!-- Ikon Eye untuk Detail -->
                                 <li>
-                                    <a href="{{ route('admin.artikels.show', $artikel->id) }}" class="dropdown-item d-flex align-items-center text-dark">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <a href="{{ route('admin.artikels.show', $artikel->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                         Lihat Detail
                                     </a>
                                 </li>
                                 <!-- Ikon Edit -->
                                 <li>
-                                    <a href="{{ route('admin.artikels.edit', $artikel->id) }}" class="dropdown-item d-flex align-items-center text-dark">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                    <a href="{{ route('admin.artikels.edit', $artikel->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-amber" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                         Edit Artikel
                                     </a>
                                 </li>
@@ -313,7 +314,7 @@
                                     <form method="POST" action="{{ route('admin.artikels.destroy', $artikel->id) }}" class="d-inline w-100" onsubmit="return confirmDelete(event, '{{ addslashes($artikel->judul) }}')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold">
+                                        <button type="submit" class="dropdown-item d-flex align-items-center text-rose fw-semibold py-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                             Hapus Artikel
                                         </button>
