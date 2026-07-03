@@ -78,49 +78,62 @@
     </div>
 </div>
 
-{{-- FILTER --}}
+{{-- FILTER & TOMBOL TAMBAH --}}
 <div class="card card-modern mb-4">
     <div class="card-body p-4">
-        <form method="GET" class="row g-3 align-items-end">
-            <div class="col-12 col-md-3">
-                <label class="form-label text-muted fw-semibold small">Pencarian</label>
-                <div class="input-icon">
-                    <span class="input-icon-addon"><x-icon name="search" class="text-slate-400" size="20" /></span>
-                    <input type="text" name="search" class="form-control" placeholder="Nama sampah, pembeli..." value="{{ request('search') }}">
-                </div>
+        <div class="row align-items-end g-3">
+            <div class="col-12 col-xl-9">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label text-muted fw-semibold small">Pencarian</label>
+                        <div class="input-icon">
+                            <span class="input-icon-addon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-slate-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            </span>
+                            <input type="text" name="search" class="form-control" placeholder="Nama sampah, pembeli..." value="{{ request('search') }}">
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label text-muted fw-semibold small">Status Stok</label>
+                        <select name="status" class="form-select">
+                            <option value="">Semua</option>
+                            <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                            <option value="sebagian" {{ request('status') == 'sebagian' ? 'selected' : '' }}>Sebagian</option>
+                            <option value="terjual" {{ request('status') == 'terjual' ? 'selected' : '' }}>Terjual</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label text-muted fw-semibold small">Status Press</label>
+                        <select name="is_pres" class="form-select">
+                            <option value="">Semua</option>
+                            <option value="1" {{ request('is_pres') == '1' ? 'selected' : '' }}>Sudah Di-Press</option>
+                            <option value="0" {{ request('is_pres') == '0' ? 'selected' : '' }}>Belum Press</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label text-muted fw-semibold small">Jenis Sampah</label>
+                        <select name="jenis_id" class="form-select">
+                            <option value="">Semua Jenis</option>
+                            @foreach($jenisSampahList as $js)
+                                <option value="{{ $js->id }}" {{ request('jenis_id') == $js->id ? 'selected' : '' }}>{{ $js->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-secondary flex-grow-1 text-white shadow-sm fw-semibold">Cari</button>
+                        <a href="{{ route('admin.stok-sampah.index') }}" class="btn btn-light border shadow-sm" title="Reset Filter">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted m-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label text-muted fw-semibold small">Status Stok</label>
-                <select name="status" class="form-select">
-                    <option value="">Semua</option>
-                    <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
-                    <option value="sebagian" {{ request('status') == 'sebagian' ? 'selected' : '' }}>Sebagian</option>
-                    <option value="terjual" {{ request('status') == 'terjual' ? 'selected' : '' }}>Terjual</option>
-                </select>
+            <div class="col-12 col-xl-3 ms-auto text-xl-end mt-3 mt-xl-0 border-top pt-3 border-xl-0 pt-xl-0 border-slate-100">
+                <a href="{{ route('admin.stok-sampah.create') }}" class="btn btn-primary shadow-sm fw-bold w-100 w-xl-auto d-inline-flex align-items-center justify-content-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Tambah Stok
+                </a>
             </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label text-muted fw-semibold small">Status Press</label>
-                <select name="is_pres" class="form-select">
-                    <option value="">Semua</option>
-                    <option value="1" {{ request('is_pres') == '1' ? 'selected' : '' }}>Sudah Di-Press</option>
-                    <option value="0" {{ request('is_pres') == '0' ? 'selected' : '' }}>Belum Press</option>
-                </select>
-            </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label text-muted fw-semibold small">Jenis Sampah</label>
-                <select name="jenis_id" class="form-select">
-                    <option value="">Semua Jenis</option>
-                    @foreach($jenisSampahList as $js)
-                        <option value="{{ $js->id }}" {{ request('jenis_id') == $js->id ? 'selected' : '' }}>{{ $js->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-12 col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-secondary text-white fw-semibold flex-grow-1"><x-icon name="search" size="16" class="me-1" />Cari</button>
-                <a href="{{ route('admin.stok-sampah.index') }}" class="btn btn-light border fw-semibold"><x-icon name="refresh" size="16" /></a>
-                <a href="{{ route('admin.stok-sampah.create') }}" class="btn btn-primary fw-semibold"><x-icon name="plus" size="16" class="me-1" />Tambah</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -208,19 +221,21 @@
 
                     <td class="pe-4 text-center">
                         <div class="dropdown">
-                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
-                                <x-icon name="settings" class="text-slate-500" size="16" />
+                            <button class="btn btn-light btn-sm dropdown-toggle shadow-sm rounded-pill px-3 fw-semibold border d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-slate-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                 <span>Aksi</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; padding: 8px; min-width: 180px;">
                                 <li>
                                     <a href="{{ route('admin.stok-sampah.show', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
-                                        <x-icon name="eye" class="text-blue me-2" size="18" />Lihat Detail
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-blue" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        Lihat Detail
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.stok-sampah.edit', $stok->id) }}" class="dropdown-item d-flex align-items-center text-dark py-2">
-                                        <x-icon name="edit" class="text-amber me-2" size="18" />Edit Data
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-amber" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                        Edit Data
                                     </a>
                                 </li>
 
@@ -230,9 +245,11 @@
                                         @csrf
                                         <button type="submit" class="dropdown-item d-flex align-items-center py-2 {{ $stok->is_published ? 'text-rose' : 'text-emerald' }} w-100">
                                             @if($stok->is_published)
-                                                <x-icon name="x" class="me-2" size="18" />Nonaktifkan Publish
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                                                Nonaktifkan Publish
                                             @else
-                                                <x-icon name="check" class="me-2" size="18" />Publikasikan
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64A9 9 0 0 1 20.77 15"/><path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                                                Publikasikan
                                             @endif
                                         </button>
                                     </form>
@@ -244,9 +261,11 @@
                                         @csrf
                                         <button type="submit" class="dropdown-item d-flex align-items-center py-2 {{ $stok->is_pres ? 'text-purple' : 'text-blue' }} w-100">
                                             @if($stok->is_pres)
-                                                <x-icon name="layers" class="me-2" size="18" />Batalkan Press
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                                Batalkan Press
                                             @else
-                                                <x-icon name="layers" class="me-2" size="18" />Tandai Press
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                                Tandai Press
                                             @endif
                                         </button>
                                     </form>
@@ -255,7 +274,8 @@
                                 @if($stok->stok_tersisa_kg > 0)
                                 <li>
                                     <button type="button" class="dropdown-item d-flex align-items-center py-2 text-emerald fw-semibold" onclick="showJualModal({{ $stok->id }}, '{{ addslashes($stok->jenisSampah->nama ?? '') }}', {{ $stok->stok_tersisa_kg }}, {{ $stok->harga_jual_per_kg }})">
-                                        <x-icon name="currency" class="text-emerald me-2" size="18" />Catat Penjualan
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-emerald me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                        Catat Penjualan
                                     </button>
                                 </li>
                                 @endif
@@ -266,7 +286,8 @@
                                     <form method="POST" action="{{ route('admin.stok-sampah.destroy', $stok->id) }}" class="d-inline w-100">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="dropdown-item d-flex align-items-center py-2 text-rose fw-semibold w-100" onclick="return confirm('Yakin hapus stok ini?')">
-                                            <x-icon name="trash" class="me-2" size="18" />Hapus Permanen
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                            Hapus Permanen
                                         </button>
                                     </form>
                                 </li>
