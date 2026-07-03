@@ -1,193 +1,207 @@
 @extends('layouts.admin')
 
 @section('title', 'Edit Admin - ' . $admin->name)
-@section('page-title', 'Edit Admin')
+@section('page-title', 'Perbarui Data Administrator')
+
+@push('styles')
+<style>
+    .card-modern {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .form-label {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.82rem;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+    .form-control {
+        border-radius: 12px;
+        border: 1.5px solid #e2e8f0;
+        padding: 0.75rem 1.1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        color: #0f172a;
+    }
+    .form-control:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        outline: none;
+    }
+    .icon-shape {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+</style>
+@endpush
 
 @section('content')
 
-<div class="container-narrow">
-
-    {{-- Breadcrumb --}}
-    <div class="d-flex align-items-center gap-2 mb-4">
-        <a href="{{ route('admin.kelola-admin.index') }}" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 19l-7 -7m0 0l7 -7m-7 7h18"/></svg>
-            Kelola Admin
+{{-- Breadcrumb --}}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ route('admin.kelola-admin.index') }}" class="text-slate-500 small fw-bold text-decoration-none d-inline-flex align-items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            Kembali ke Daftar Admin
         </a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6"/></svg>
-        <span class="text-muted small">Edit</span>
     </div>
+    <span class="badge bg-amber bg-opacity-10 text-amber border border-amber border-opacity-25 px-3 py-2 rounded-pill fw-bold">
+        🛠️ Mode Perubahan Data
+    </span>
+</div>
 
-    {{-- INFO AKUN --}}
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="d-flex align-items-center gap-3">
-                <div class="avatar avatar-lg avatar-rounded bg-primary-lt text-primary d-flex align-items-center justify-content-center fw-bold" style="font-size:1.2rem;">
+{{-- INFO AKUN RINGKAS --}}
+<div class="card card-modern mb-4 border-start border-4 border-primary" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);">
+    <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+            @if($admin->foto)
+                <img src="{{ asset('storage/' . $admin->foto) }}" alt="{{ $admin->name }}" class="avatar avatar-xl rounded-circle shadow-sm border border-2" style="width: 68px; height: 68px; object-fit: cover;">
+            @else
+                <div class="avatar avatar-xl rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 68px; height: 68px; font-size: 1.8rem;">
                     {{ strtoupper(substr($admin->name, 0, 1)) }}
                 </div>
-                <div class="flex-fill">
-                    <div class="fw-bold fs-6">{{ $admin->name }}</div>
-                    <div class="text-muted small">{{ $admin->email }}</div>
-                    <div class="d-flex gap-1 mt-1">
-                        <span class="badge {{ $admin->is_active ? 'bg-success' : 'bg-danger' }}">
-                            @if($admin->is_active)
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="12" height="12" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
-                            @else
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="12" height="12" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg>
-                            @endif
-                            {{ $admin->is_active ? 'Aktif' : 'Nonaktif' }}
-                        </span>
-                        <span class="badge {{ $admin->password_changed ? 'bg-blue-lt text-blue' : 'bg-warning-lt text-warning' }}">
-                            @if($admin->password_changed)
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="12" height="12" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
-                            @else
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="12" height="12" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v2m0 4h.01"/></svg>
-                            @endif
-                            {{ $admin->password_changed ? 'Password Diganti' : 'Password Default' }}
-                        </span>
-                    </div>
+            @endif
+            <div>
+                <h4 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    {{ $admin->name }}
+                    @if($admin->is_active)
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill small px-2">Aktif</span>
+                    @else
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill small px-2">Nonaktif</span>
+                    @endif
+                </h4>
+                <div class="text-slate-500 small d-flex align-items-center gap-2 flex-wrap">
+                    <span>📧 {{ $admin->email }}</span>
+                    <span>•</span>
+                    <span>🛡️ Status Sandi: <strong class="{{ $admin->password_changed ? 'text-success' : 'text-warning' }}">{{ $admin->password_changed ? 'Sandi Aman' : 'Default (admin123)' }}</strong></span>
                 </div>
-                <a href="{{ route('admin.kelola-admin.view', $admin->id) }}" class="btn btn-outline-info btn-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0 -20"/></svg>
-                    Detail
-                </a>
             </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.kelola-admin.view', $admin->id) }}" class="btn btn-light border rounded-pill fw-bold px-4 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                Lihat Detail Lengkap
+            </a>
         </div>
     </div>
+</div>
 
-    {{-- FORM EDIT --}}
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/><path d="M20.385 6.585a2.196 2.196 0 0 0 -1.606 -3.175a2.196 2.196 0 0 0 -2.606 1.297l-7.173 14.293l-2.4.4l1.6 -2.4l7.173 -14.293z"/></svg>
-                Edit Informasi Akun
-            </h3>
-            <div class="card-options">
-                <span class="badge bg-warning-lt text-warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v2m0 4h.01"/></svg>
-                    Mode Edit
-                </span>
+{{-- FORM EDIT --}}
+<div class="card card-modern">
+    <div class="card-header bg-white border-bottom p-4 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="icon-shape bg-amber bg-opacity-10 text-amber me-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+            </div>
+            <div>
+                <h3 class="card-title fw-bold text-dark m-0 fs-4">Pembaruan Identitas & Kredensial</h3>
+                <p class="text-slate-500 small m-0 mt-1">Perubahan informasi akan langsung diterapkan dan tercatat dalam log audit sistem.</p>
             </div>
         </div>
+        <span class="text-muted small font-monospace">Terakhir Diperbarui: {{ $admin->updated_at->format('d/m/Y H:i') }}</span>
+    </div>
+
+    <div class="card-body p-4 p-md-5">
+        @if ($errors->any())
+            <div class="alert alert-danger border-0 rounded-4 p-3 mb-4">
+                <div class="small fw-bold mb-1">Terjadi kesalahan pada input data:</div>
+                <ul class="mb-0 small ps-3">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form method="POST" action="{{ route('admin.kelola-admin.update', $admin->id) }}">
             @csrf @method('PUT')
 
-            <div class="card-body">
-                <div class="row g-4">
+            <div class="row g-4">
+                {{-- Nama Lengkap --}}
+                <div class="col-md-6">
+                    <label class="form-label required">Nama Lengkap Pengurus</label>
+                    <input type="text" name="name" class="form-control fw-bold text-dark @error('name') is-invalid @enderror" value="{{ old('name', $admin->name) }}" required autofocus>
+                    @error('name')
+                        <div class="invalid-feedback fw-medium mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    {{-- Nama Lengkap --}}
-                    <div class="col-12">
-                        <label class="form-label required fw-semibold">Nama Lengkap</label>
-                        <div class="input-icon">
-                            <span class="input-icon-addon">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 21v-2a4 4 0 0 0 -4 -4h-8a4 4 0 0 0 -4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </span>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $admin->name) }}" placeholder="Contoh: Ahmad Fauzi" required autofocus>
-                        </div>
-                        @error('name')
-                        <div class="invalid-feedback d-flex align-items-center gap-1 mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M12 8l0 4"/><path d="M12 16l.01 0"/></svg>
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
+                {{-- Email --}}
+                <div class="col-md-6">
+                    <label class="form-label required">Alamat Email Resmi</label>
+                    <input type="email" name="email" class="form-control fw-bold text-dark @error('email') is-invalid @enderror" value="{{ old('email', $admin->email) }}" required>
+                    @error('email')
+                        <div class="invalid-feedback fw-medium mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    {{-- Email --}}
-                    <div class="col-12">
-                        <label class="form-label required fw-semibold">Email</label>
-                        <div class="input-icon">
-                            <span class="input-icon-addon">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8"/><path d="M5 19h14a2 2 0 0 0 2 -2V7a2 2 0 0 0 -2 -2H5a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2z"/></svg>
-                            </span>
-                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $admin->email) }}" placeholder="contoh@email.com" required>
+                {{-- Divider --}}
+                <div class="col-12 mt-4">
+                    <div class="p-4 rounded-4 bg-light border">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-dark text-white rounded-pill px-3 py-1">OPSIONAL</span>
+                            <h6 class="m-0 fw-bold text-dark">Perbarui Keamanan Password</h6>
                         </div>
-                        @error('email')
-                        <div class="invalid-feedback d-flex align-items-center gap-1 mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M12 8l0 4"/><path d="M12 16l.01 0"/></svg>
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
+                        <p class="text-muted small mb-3">Biarkan kedua kolom di bawah ini <strong>kosong</strong> jika Anda tidak ingin mengganti kata sandi admin ini.</p>
 
-                    {{-- Divider --}}
-                    <div class="col-12">
-                        <hr class="my-1">
-                        <div class="d-flex align-items-center gap-2 mt-2 mb-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 15v2m-6 4h12a2 2 0 0 0 2 -2v-6a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2zm10 -10v-4a1 1 0 0 0 -1 -1h-4a1 1 0 0 0 -1 1v4"/></svg>
-                            <span class="text-muted small fw-semibold">UBAH PASSWORD</span>
-                            <span class="badge bg-secondary-lt text-secondary" style="font-size:10px;">OPSIONAL</span>
-                        </div>
-                    </div>
+                        <div class="row g-3">
+                            {{-- Password Baru --}}
+                            <div class="col-md-6">
+                                <label class="form-label">Password Baru</label>
+                                <div class="position-relative">
+                                    <input type="password" name="password" id="passwordInput" class="form-control @error('password') is-invalid @enderror" placeholder="Kosongkan jika tidak diganti">
+                                    <span class="position-absolute end-0 top-50 translate-middle-y me-3 text-slate-400" style="cursor: pointer;" onclick="togglePw('passwordInput', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20z"/></svg>
+                                    </span>
+                                </div>
+                                <span class="text-slate-400 small mt-1 d-block">Minimal 6 karakter</span>
+                                @error('password')
+                                    <div class="invalid-feedback fw-medium mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                    {{-- Info password --}}
-                    <div class="col-12">
-                        <div class="alert alert-warning mb-0 py-2 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v2m0 4h.01"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></svg>
-                                <span class="text-muted small">Biarkan kosong jika <strong>tidak ingin mengubah</strong> password. Jika diisi, status password akan berubah menjadi "Sudah Diganti".</span>
+                            {{-- Konfirmasi Password --}}
+                            <div class="col-md-6">
+                                <label class="form-label">Konfirmasi Password Baru</label>
+                                <div class="position-relative">
+                                    <input type="password" name="password_confirmation" id="passwordConfirmInput" class="form-control" placeholder="Ulangi password baru">
+                                    <span class="position-absolute end-0 top-50 translate-middle-y me-3 text-slate-400" style="cursor: pointer;" onclick="togglePw('passwordConfirmInput', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20z"/></svg>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Password Baru --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Password Baru</label>
-                        <div class="input-icon">
-                            <span class="input-icon-addon">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 15v2m-6 4h12a2 2 0 0 0 2 -2v-6a2 2 0 0 0 -2 -2h-12a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2zm10 -10v-4a1 1 0 0 0 -1 -1h-4a1 1 0 0 0 -1 1v4"/></svg>
-                            </span>
-                            <input type="password" name="password" id="passwordInput" class="form-control @error('password') is-invalid @enderror" placeholder="Kosongkan jika tidak diubah">
-                            <span class="input-icon-addon cursor-pointer" onclick="togglePw('passwordInput', this)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-eye" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0 -20z"/></svg>
-                            </span>
-                        </div>
-                        <div class="form-hint">Minimal 6 karakter</div>
-                        @error('password')
-                        <div class="invalid-feedback d-flex align-items-center gap-1 mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M12 8l0 4"/><path d="M12 16l.01 0"/></svg>
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
-
-                    {{-- Konfirmasi Password --}}
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Konfirmasi Password Baru</label>
-                        <div class="input-icon">
-                            <span class="input-icon-addon">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 12l2 2l4 -4m5.618 -4.016a11.955 11.955 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>
-                            </span>
-                            <input type="password" name="password_confirmation" id="passwordConfirmInput" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Ulangi password baru">
-                            <span class="input-icon-addon cursor-pointer" onclick="togglePw('passwordConfirmInput', this)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-eye" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0 -20z"/></svg>
-                            </span>
-                        </div>
-                        @error('password_confirmation')
-                        <div class="invalid-feedback d-flex align-items-center gap-1 mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M12 8l0 4"/><path d="M12 16l.01 0"/></svg>
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
-
                 </div>
-            </div>
 
-            {{-- Footer --}}
-            <div class="card-footer d-flex justify-content-end gap-2 border-top">
-                <a href="{{ route('admin.kelola-admin.index') }}" class="btn btn-outline-secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 19l-7 -7m0 0l7 -7m-7 7h18"/></svg>
-                    Batal
-                </a>
-                <button type="submit" class="btn btn-warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10"/></svg>
-                    Simpan Perubahan
-                </button>
+                {{-- Footer Action --}}
+                <div class="col-12 mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span class="text-muted small">💡 Sistem akan mencatat waktu pembaruan (`updated_at`) setelah disimpan.</span>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('admin.kelola-admin.index') }}" class="btn btn-light border rounded-pill px-4 fw-bold">
+                            Batal
+                        </a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm d-inline-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
@@ -197,10 +211,10 @@ function togglePw(inputId, btn) {
     const icon = btn.querySelector('.icon-eye');
     if (input.type === 'password') {
         input.type = 'text';
-        icon.innerHTML = '<path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 9a5 5 0 0 0 0 8m6.9 -5.7a9 9 0 0 1 1.1 5.7a9 9 0 0 1 -1.1 5.7"/><path d="M10.1 3.3a9 9 0 0 0 -7.1 6.7a9 9 0 0 0 7.1 6.7"/><line x1="2" y1="2" x2="22" y2="22"/>';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
     } else {
         input.type = 'password';
-        icon.innerHTML = '<path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0 -20z"/>';
+        icon.innerHTML = '<circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20z"/>';
     }
 }
 </script>
