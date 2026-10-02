@@ -21,12 +21,41 @@ class Nasabah extends Model
         'password_changed',
         'tanggal_bergabung',
         'catatan_admin',
+        // Push notification
+        'expo_push_token',
+        // Lokasi GPS registrasi
+        'latitude',
+        'longitude',
+        'lokasi_registrasi',
+        // Verifikasi KTP
+        'ktp_verification_status',
+        'ktp_verified_at',
+        'ktp_rejection_reason',
     ];
 
     protected $casts = [
-        'tanggal_bergabung' => 'date',
-        'password_changed'  => 'boolean',
+        'tanggal_bergabung'    => 'date',
+        'password_changed'     => 'boolean',
+        'ktp_verified_at'      => 'datetime',
+        'latitude'             => 'float',
+        'longitude'            => 'float',
     ];
+
+    /**
+     * Apakah KTP nasabah sudah diverifikasi valid?
+     */
+    public function isKtpValid(): bool
+    {
+        return $this->ktp_verification_status === 'valid';
+    }
+
+    /**
+     * Apakah nasabah bisa melakukan penarikan? (akun aktif + KTP valid)
+     */
+    public function canWithdraw(): bool
+    {
+        return $this->status_akun === 'active' && $this->isKtpValid();
+    }
 
     // Relasi ke user (akun login)
     public function user()

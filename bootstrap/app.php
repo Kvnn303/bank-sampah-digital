@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,8 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->statefulApi();
         $middleware->alias([
-            'is.admin'   => \App\Http\Middleware\IsAdmin::class,
-            'admin.auth' => \App\Http\Middleware\AdminMiddleware::class,
+            'is.admin'        => \App\Http\Middleware\IsAdmin::class,
+            'admin.auth'      => \App\Http\Middleware\AdminMiddleware::class,
+            'api.security'    => \App\Http\Middleware\ApiSecurityMiddleware::class,
+        ]);
+
+        // Tambahkan security middleware ke semua API routes
+        $middleware->api(append: [
+            \App\Http\Middleware\ApiSecurityMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -27,8 +35,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
+                    'success' => false,
                     'message' => 'Unauthenticated. Silakan login terlebih dahulu.'
                 ], 401);
+            }
+        });
+
+        // Rate limit exception → return JSON
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success'     => false,
+                    'message'     => 'Terlalu banyak permintaan. Coba lagi nanti.',
+                    'retry_after' => $e->getHeaders()['Retry-After'] ?? 60,
+                ], 429);
             }
         });
     })->create();

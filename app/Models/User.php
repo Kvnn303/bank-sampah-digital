@@ -19,6 +19,13 @@ class User extends Authenticatable
         'login_username',
         'password_changed',
         'is_active',
+        // Push notification
+        'expo_push_token',
+        // Security tracking
+        'last_login_at',
+        'last_login_ip',
+        'failed_login_count',
+        'locked_until',
     ];
 
     protected $hidden = [

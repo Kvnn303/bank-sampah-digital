@@ -8,9 +8,13 @@ use App\Models\Nasabah;
 use App\Models\Notification;
 use App\Services\AuditLogService;
 use App\Services\NotificationService;
+use App\Services\ExpoPushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use App\Models\AuditLog;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -18,15 +22,50 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'         => 'required|string|max:255',
-            'email'        => 'required|email|unique:users',
-            'password'     => 'required|min:6|confirmed',
-            'nama_lengkap' => 'required|string',
-            'alamat'       => 'nullable|string',
-            'no_telepon'   => 'nullable|string',
-            'no_ktp'       => 'nullable|string|unique:nasabah',
-            'foto_ktp'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'name'              => 'required|string|max:255',
+            'email'             => 'required|email|unique:users',
+            'password'          => 'required|min:8|confirmed', // Min 8 karakter untuk keamanan
+            'nama_lengkap'      => 'required|string|max:255',
+            'alamat'            => 'required|string',          // Wajib untuk verifikasi domisili
+            'no_telepon'        => 'required|string|max:20|regex:/^[0-9+\-\s()]+$/', // Validasi format telepon
+            'no_ktp'            => 'nullable|string|size:16|regex:/^[0-9]{16}$/', // NIK harus 16 digit angka
+            // Foto KTP wajib, minimal 50KB (untuk cegah foto buram/asal), maks 5MB
+            'foto_ktp'          => 'required|image|mimes:jpg,jpeg,png|max:5120|min:10',
+            // Koordinat GPS opsional tapi disimpan jika ada
+            'latitude'          => 'nullable|numeric|between:-90,90',
+            'longitude'         => 'nullable|numeric|between:-180,180',
+            'lokasi_registrasi' => 'nullable|string|max:500',
+        ], [
+            'no_ktp.size'       => 'Nomor KTP harus tepat 16 digit.',
+            'no_ktp.regex'      => 'Nomor KTP hanya boleh berisi angka.',
+            'foto_ktp.required' => 'Foto KTP wajib diunggah untuk verifikasi identitas.',
+            'foto_ktp.min'      => 'Foto KTP terlalu kecil/buram. Gunakan foto yang jelas.',
+            'password.min'      => 'Password minimal 8 karakter untuk keamanan akun.',
         ]);
+
+        // ── Validasi tambahan: cek ukuran file KTP minimal 50KB (anti foto abal-abal) ──
+        if ($request->hasFile('foto_ktp')) {
+            $ktpFile = $request->file('foto_ktp');
+            if ($ktpFile->getSize() < 50 * 1024) { // < 50KB
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Foto KTP terlalu kecil atau buram. Harap foto ulang dengan pencahayaan yang baik.',
+                    'errors'  => ['foto_ktp' => ['Foto KTP minimal 50KB. Pastikan foto jelas dan terbaca.']]
+                ], 422);
+            }
+        }
+
+        // ── Validasi: pastikan no_ktp dari daerah yang valid (2 digit pertama = kode provinsi) ──
+        if ($request->filled('no_ktp')) {
+            $noKtp = $request->no_ktp;
+            $kodeProvinsi = (int) substr($noKtp, 0, 2);
+            if ($kodeProvinsi < 11 || $kodeProvinsi > 99) {
+                return response()->json([
+                    'success' => false,
+                    'errors'  => ['no_ktp' => ['Nomor KTP tidak valid. Periksa kembali NIK Anda.']]
+                ], 422);
+            }
+        }
 
         $fotoKtpPath = null;
         if ($request->hasFile('foto_ktp')) {
@@ -38,31 +77,40 @@ class AuthController extends Controller
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
             'role'      => 'nasabah',
-            'is_active' => 1, // Pastikan defaultnya aktif
+            'is_active' => 1,
         ]);
 
         Nasabah::create([
-            'user_id'          => $user->id,
-            'nama_lengkap'     => $request->nama_lengkap,
-            'alamat'           => $request->alamat,
-            'no_telepon'       => $request->no_telepon,
-            'no_ktp'           => $request->no_ktp,
-            'foto_ktp'         => $fotoKtpPath,
-            'status_akun'      => 'pending',
-            'sumber_daftar'    => 'mandiri',
-            'tanggal_bergabung'=> now()->toDateString(),
+            'user_id'              => $user->id,
+            'nama_lengkap'         => $request->nama_lengkap,
+            'alamat'               => $request->alamat,
+            'no_telepon'           => $request->no_telepon,
+            'no_ktp'               => $request->no_ktp,
+            'foto_ktp'             => $fotoKtpPath,
+            'status_akun'          => 'pending',
+            'sumber_daftar'        => 'mandiri',
+            'tanggal_bergabung'    => now()->toDateString(),
+            // Simpan data lokasi GPS jika disediakan
+            'latitude'             => $request->latitude,
+            'longitude'            => $request->longitude,
+            'lokasi_registrasi'    => $request->lokasi_registrasi,
+            // Status verifikasi KTP dimulai dari pending
+            'ktp_verification_status' => 'pending',
         ]);
+
+        // Notifikasi ke admin ada nasabah baru
+        NotificationService::nasabahBaru($request->nama_lengkap);
 
         AuditLogService::log(
             action: 'REGISTER',
             module: 'Auth',
-            description: "Nasabah baru mendaftar: {$user->name}",
+            description: "Nasabah baru mendaftar: {$user->name} (KTP: " . ($request->no_ktp ?? 'belum diisi') . ")",
             status: 'success'
         );
 
         return response()->json([
             'success' => true,
-            'message' => 'Registrasi berhasil! Menunggu verifikasi admin.',
+            'message' => 'Registrasi berhasil! Akun Anda sedang menunggu verifikasi KTP oleh admin (1-2 hari kerja).',
             'user'    => $user,
         ], 201);
     }
@@ -71,15 +119,42 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+            'email'            => 'required|email',
+            'password'         => 'required',
+            'expo_push_token'  => 'nullable|string|max:200', // Token device untuk push notification
         ]);
+
+        // ── Brute Force Protection: Rate limit 5 percobaan per IP per 15 menit ──
+        $rateLimitKey = 'login_attempt:' . Str::lower($request->email) . ':' . $request->ip();
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            $seconds = RateLimiter::availableIn($rateLimitKey);
+            $menit   = ceil($seconds / 60);
+
+            AuditLog::create([
+                'user_name'   => $request->email,
+                'action'      => 'LOGIN_RATE_LIMITED',
+                'module'      => 'Auth',
+                'description' => "Login diblokir akibat terlalu banyak percobaan untuk: {$request->email}",
+                'ip_address'  => $request->ip(),
+                'user_agent'  => $request->userAgent(),
+                'status'      => 'failed',
+            ]);
+
+            return response()->json([
+                'success'      => false,
+                'message'      => "Terlalu banyak percobaan login. Coba lagi dalam {$menit} menit.",
+                'retry_after'  => $seconds,
+            ], 429);
+        }
 
         // Muat user sekalian dengan relasi nasabahnya
         $user = User::with('nasabah')->where('email', $request->email)->first();
 
         // 1. Cek Ketersediaan User & Keamanan Password
         if (! $user || ! Hash::check($request->password, $user->password)) {
+            // Tambah counter rate limit
+            RateLimiter::hit($rateLimitKey, 900); // Decay 15 menit
+
             AuditLog::create([
                 'user_name'   => $request->email,
                 'action'      => 'LOGIN_FAILED',
@@ -94,6 +169,15 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Email atau password salah.'
             ], 401);
+        }
+
+        // ── Cek apakah akun terkunci akibat brute force sebelumnya ──
+        if ($user->locked_until && Carbon::parse($user->locked_until)->isFuture()) {
+            $menit = Carbon::now()->diffInMinutes(Carbon::parse($user->locked_until), false);
+            return response()->json([
+                'success' => false,
+                'message' => "Akun terkunci sementara. Coba lagi dalam {$menit} menit atau hubungi admin.",
+            ], 403);
         }
 
         // 2. Cek Validasi Status Aktivasi & Verifikasi Nasabah
@@ -159,13 +243,34 @@ class AuthController extends Controller
         // 3. Generate Token Sanctum jika status_akun === 'active' (Lolos semua validasi di atas)
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // ── Reset rate limiter setelah login berhasil ──
+        RateLimiter::clear($rateLimitKey);
+
+        // ── Simpan expo_push_token dan tracking login ──
+        $updates = [
+            'last_login_at'     => now(),
+            'last_login_ip'     => $request->ip(),
+            'failed_login_count' => 0,
+            'locked_until'      => null,
+        ];
+        if ($request->filled('expo_push_token') && ExpoPushNotificationService::isValidToken($request->expo_push_token)) {
+            $updates['expo_push_token'] = $request->expo_push_token;
+
+            // Juga simpan ke tabel nasabah jika ada
+            if ($user->nasabah) {
+                $user->nasabah->update(['expo_push_token' => $request->expo_push_token]);
+            }
+        }
+        $user->update($updates);
+
         AuditLogService::log(
             action: 'LOGIN',
             module: 'Auth',
-            description: "User {$user->name} ({$user->role}) berhasil login dari aplikasi Mobile",
+            description: "User {$user->name} ({$user->role}) berhasil login dari aplikasi Mobile | IP: {$request->ip()}",
             status: 'success'
         );
 
+        // Notifikasi in-app (tersimpan di database)
         NotificationService::send(
             targetRole: $user->role,
             type:        Notification::TYPE_AUTH,
@@ -176,6 +281,14 @@ class AuthController extends Controller
             status:      'unread',
             priority:    'normal'
         );
+
+        // ── Push notification ke perangkat lain jika token ada (login baru) ──
+        // Hanya kirim jika token berbeda dari yang tersimpan (login di perangkat baru)
+        $storedToken = $user->expo_push_token;
+        $newToken    = $request->expo_push_token;
+        if ($storedToken && $newToken && $storedToken !== $newToken && ExpoPushNotificationService::isValidToken($storedToken)) {
+            ExpoPushNotificationService::notifyLoginBaru($storedToken, $user->name, $request->ip());
+        }
 
         return response()->json([
             'success'              => true,
